@@ -315,3 +315,39 @@ body {
 }
 .float-btn.danger { background: var(--cartoon-pink); }
 .float-btn.success { background: var(--cartoon-mint); }
+
+/* =============================================
+   可访问性：尊重用户的「减少动效」偏好
+   - 操作系统 / 浏览器里开启「减少动画」时生效
+   - 把所有 animation / transition 缩到几乎为 0
+   ============================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =============================================
+   可访问性：键盘焦点环
+   - 之前自定义 box-shadow 覆盖了浏览器默认 focus
+   - 用 :focus-visible（只对键盘生效，不影响鼠标点击）
+   - 高对比的卡通风格焦点环
+   ============================================= */
+*:focus-visible {
+  outline: 3px solid var(--cartoon-blue, #A0C4FF);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 按钮类元素的焦点环要更醒目（白底加蓝色描边） */
+button:focus-visible,
+.el-button:focus-visible {
+  outline: 3px solid var(--cartoon-blue, #A0C4FF);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #fff inset;
+}

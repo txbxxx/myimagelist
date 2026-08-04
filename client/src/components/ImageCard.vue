@@ -18,9 +18,9 @@
       <div v-else-if="animatedKind" class="media-badge animated" :class="animatedKind">
         <span>{{ animatedKind === 'gif' ? '✨' : '🌀' }}</span> {{ animatedKind.toUpperCase() }}
       </div>
-      <!-- 左上：分类标签 -->
-      <div class="cat-badge" v-if="category" :style="{ background: category.color }">
-        <span class="cat-dot"></span>
+      <!-- 左上：分类标签（自动根据背景色对比度选文字色，保证可读） -->
+      <div class="cat-badge" v-if="category" :style="catBadgeStyle">
+        <span class="cat-dot" :style="{ background: catTextColor }"></span>
         {{ category.name }}
       </div>
       <!-- 右上：下载按钮 -->
@@ -56,6 +56,7 @@
 import { computed } from 'vue';
 import { Download, ZoomIn } from '@element-plus/icons-vue';
 import { useGalleryStore } from '../stores/gallery';
+import { readableTextColor } from '../utils/color';
 
 const props = defineProps({ image: { type: Object, required: true } });
 defineEmits(['click']);
@@ -63,6 +64,17 @@ defineEmits(['click']);
 const store = useGalleryStore();
 const category = computed(() => store.categoryMap[props.image.categoryId]);
 const isVideo = computed(() => props.image.type === 'video' || (props.image.mimeType && props.image.mimeType.startsWith('video/')));
+
+// 分类标签：根据背景色自动选可读的文字色（WCAG AA）
+const catTextColor = computed(() =>
+  category.value ? readableTextColor(category.value.color) : '#3E2723'
+);
+const catBadgeStyle = computed(() => ({
+  background: category.value?.color,
+  color: catTextColor.value,
+  // 边框色也跟着调：文字深→深边框，文字浅→白边框
+  borderColor: catTextColor.value === '#FFFFFF' ? '#FFFFFF' : 'var(--cartoon-brown)'
+}));
 
 // 动图识别：image/gif 一定动；image/webp 可能是静态也可能是动态，但浏览器侧很难 100% 判别
 // 简化方案：mime 为 image/gif → gif；mime 为 image/webp → webp（按客户端文件名/常见场景默认动态）
@@ -286,6 +298,19 @@ function handleDownload() {
 .image-card:hover .dl-btn {
   opacity: 1;
   transform: translateY(0) rotate(0);
+}
+
+/* 触屏设备：没有 hover，默认就把下载按钮和遮罩露出来 */
+@media (hover: none) {
+  .dl-btn {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+  .hover-mask {
+    /* 触屏没 hover，让"点我看大图"文字也常驻 */
+    background: rgba(255, 214, 165, 0.5);
+    opacity: 0.5;  /* 一直半透，不抢戏但可点 */
+  }
 }
 .dl-btn:hover {
   background: var(--cartoon-yellow);

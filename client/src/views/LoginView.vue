@@ -65,9 +65,10 @@
 
         <div class="switch-mode">
           {{ isLogin ? '还没有账号？' : '已经有账号了？' }}
-          <a class="link" @click="toggleMode">
+          <!-- a11y: 用 button 而不是 <a>，才能被键盘聚焦 + 屏幕阅读器识别为按钮 -->
+          <button type="button" class="link" @click="toggleMode" :aria-label="isLogin ? '切换到注册' : '切换到登录'">
             {{ isLogin ? '去注册' : '去登录' }}
-          </a>
+          </button>
         </div>
       </el-form>
 
@@ -222,6 +223,12 @@ async function onSubmit() {
   font-weight: 600;
 }
 .link {
+  /* 重置 button 默认样式，让它看起来跟原来 <a> 一样 */
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
   color: #A0C4FF;
   text-decoration: underline wavy var(--cartoon-pink);
   font-weight: 900;

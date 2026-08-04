@@ -28,14 +28,18 @@
         </div>
         <div class="form-field">
           <label class="form-label">颜色</label>
-          <div class="color-picker">
+          <div class="color-picker" role="radiogroup" aria-label="选择分类颜色">
             <button
               v-for="c in palette"
               :key="c"
+              type="button"
               class="color-dot"
               :class="{ active: newColor === c }"
               :style="{ background: c }"
               :title="c"
+              :aria-label="`颜色 ${c}（${contrastLabel(c)}）`"
+              :aria-checked="newColor === c"
+              role="radio"
               @click="newColor = c"
             ></button>
           </div>
@@ -117,7 +121,15 @@
             <div class="cat-info">
               <div class="cat-name">{{ cat.name }}</div>
               <div class="cat-meta">
-                <span class="badge" :style="{ background: cat.color }">{{ getCategoryCount(cat.id) }} 张图</span>
+                <!-- 背景色跟分类走，文字色自动选对比度高的 -->
+                <span
+                  class="badge"
+                  :style="{
+                    background: cat.color,
+                    color: readableTextColor(cat.color),
+                    borderColor: readableTextColor(cat.color) === '#FFFFFF' ? '#FFFFFF' : 'var(--cartoon-brown)'
+                  }"
+                >{{ getCategoryCount(cat.id) }} 张图</span>
                 <span v-if="cat.id.startsWith('cat_default')" class="default-tag">默认</span>
                 <span v-else class="id-tag">id: {{ cat.id }}</span>
               </div>
@@ -163,14 +175,25 @@ import {
 } from '@element-plus/icons-vue';
 import { Icon } from '@iconify/vue';
 import { useGalleryStore } from '../stores/gallery';
+import { readableTextColor, contrastRatio } from '../utils/color';
 
 const store = useGalleryStore();
 
 // 糖果色板（与后端一致）
 const palette = [
   '#FFD6A5', '#FFADAD', '#FDFFB6', '#CAFFBF',
-  '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'
+  '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF',
 ];
+
+// 给色板按钮一个文字提示（对比度怎么样）
+function contrastLabel(hex) {
+  const r = contrastRatio(hex, '#3E2723');
+  if (r == null) return '';
+  if (r >= 7) return `对比度 ${r.toFixed(1)}（优秀）`;
+  if (r >= 4.5) return `对比度 ${r.toFixed(1)}（达标）`;
+  if (r >= 3) return `对比度 ${r.toFixed(1)}（偏低）`;
+  return `对比度 ${r.toFixed(1)}（差）`;
+}
 
 const newName = ref('');
 const newColor = ref(palette[5]);
