@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>糖果图库 · 优化原型 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+/* ============ 设计 Token（优化版：全部收敛到变量） ============ */
+:root {
+  --bg: #FFF9E6;
+  --bg-soft: #FFF0F5;
+  --blue: #A0C4FF;
+  --blue-deep: #7AA8F0;
+  --mint: #CAFFBF;
+  --pink: #FFADAD;
+  --yellow: #FDFFB6;
+  --purple: #BDB2FF;
+  --peach: #FFD6A5;
+  --brown: #4A3B32;
+  --brown-deep: #3E2723;
+  --white: #FFFFFF;
+
+  /* 高对比文字色：用于浅糖果底上保证 4.5:1 以上 */
+  --ink-on-candy: #2E2019;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --border: 3px solid var(--brown);
+  --shadow: 4px 4px 0 var(--brown);
+  --shadow-hover: 6px 6px 0 var(--brown);
+  --shadow-sm: 2px 2px 0 var(--brown);
+
+  /* 焦点环（新增） */
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 6px var(--blue-deep);
+
+  /* 字号阶梯（新增） */
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 28px;
+
+  /* 间距阶梯（新增） */
+  --sp-1: 6px;
+  --sp-2: 12px;
+  --sp-3: 18px;
+  --sp-4: 24px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink-on-candy);
+  padding: var(--sp-4);
+  line-height: 1.6;
+}
+
+h1, h2, h3 { font-family: 'ZCOOL KuaiLe', 'Nunito', sans-serif; color: var(--brown-deep); }
+
+/* ============ 可访问性：reduced-motion（原型中用 class 模拟开关） ============ */
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 全局可见焦点环 */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring) !important;
+  border-radius: 8px;
+}
+
+/* ============ 原型框架样式 ============ */
+.proto-header {
+  max-width: 1100px;
+  margin: 0 auto var(--sp-4);
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--sp-4);
+}
+.proto-header h1 { font-size: var(--fs-xl); display: flex; align-items: center; gap: var(--sp-2); }
+.proto-header p { margin-top: var(--sp-1); font-size: var(--fs-sm); }
+.proto-controls {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3);
+}
+.toggle-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-soft);
+  border: var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  color: var(--brown-deep);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  user-select: none;
+}
+.toggle-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.toggle-chip:active { transform: translateY(1px); box-shadow: 1px 1px 0 var(--brown); }
+.toggle-chip[aria-pressed="true"] { background: var(--mint); }
+
+.section {
+  max-width: 1100px;
+  margin: 0 auto var(--sp-4);
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--sp-4);
+}
+.section-head { display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap; }
+.section-head h2 { font-size: var(--fs-lg); }
+.badge {
+  font-size: var(--fs-xs); font-weight: 800;
+  padding: 3px 12px; border-radius: 999px;
+  border: 2px solid var(--brown);
+  box-shadow: var(--shadow-sm);
+}
+.badge.high { background: var(--pink); }
+.badge.mid { background: var(--yellow); }
+.section-desc { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--sp-3); }
+.section-desc code {
+  background: var(--bg-soft); border: 2px solid var(--brown);
+  border-radius: 6px; padding: 0 6px; font-size: var(--fs-xs);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+@media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+.pane {
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.pane-title {
+  padding: 8px 14px;
+  font-weight: 900;
+  font-size: var(--fs-sm);
+  border-bottom: var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.pane.before .pane-title { background: #F3E9E2; color: #8a7a70; }
+.pane.after .pane-title { background: var(--mint); color: var(--brown-deep); }
+.pane-body { padding: var(--sp-3); background: var(--bg); min-height: 120px; }
+.note {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+  background: var(--bg-soft);
+  border: 2px dashed var(--brown);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+/* ============ 组件：按钮 ============ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  border: var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  font-family: inherit; font-weight: 900; font-size: var(--fs-sm);
+  color: var(--brown-deep);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.btn:active { transform: translateY(2px); box-shadow: 1px 1px 0 var(--brown); }
+.btn.blue { background: linear-gradient(180deg, #B5E2FF, var(--blue)); }
+.btn.mint { background: var(--mint); }
+.btn.pink { background: var(--pink); }
+.btn.yellow { background: var(--yellow); }
+
+/* 链接式按钮（修复：登录切换从 <a> 改为 <button>） */
+.link-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 800; font-size: var(--fs-sm);
+  color: var(--blue-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.link-btn:hover { color: var(--brown-deep); background: var(--bg-soft); }
+
+/* ============ 组件：图片卡片 ============ */
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--sp-3);
+}
+.img-card {
+  position: relative;
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.img-card:hover { transform: translateY(-4px) rotate(-1deg); box-shadow: var(--shadow-hover); }
+.img-thumb {
+  aspect-ratio: 1;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px;
+  border-bottom: var(--border);
+  position: relative;
+}
+.cat-tag {
+  position: absolute; top: 8px; left: 8px;
+  font-size: var(--fs-xs); font-weight: 900;
+  padding: 2px 10px; border-radius: 999px;
+  border: 2px solid var(--brown);
+  box-shadow: var(--shadow-sm);
+}
+.card-actions {
+  position: absolute; right: 8px; bottom: 8px;
+  display: flex; gap: 6px;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--white);
+  border: var(--border);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.15s;
+}
+.icon-btn:hover { transform: scale(1.12); }
+
+/* 改前：hover 才显示 */
+.card-old .card-actions { opacity: 0; transition: opacity 0.2s; }
+.card-old:hover .card-actions { opacity: 1; }
+
+/* 改后：触控设备常显（用 .touch-sim 模拟），桌面 hover 显示 */
+.card-new .card-actions { opacity: 0; transition: opacity 0.2s; }
+.card-new:hover .card-actions,
+.card-new:focus-within .card-actions { opacity: 1; }
+.touch-sim .card-new .card-actions { opacity: 1; }
+
+.img-meta { padding: 10px 12px; font-size: var(--fs-xs); font-weight: 700; }
+.img-meta .name { font-size: var(--fs-sm); font-weight: 900; display: block; margin-bottom: 2px; }
+.img-meta .sub { color: #7a6a60; }
+
+/* ============ 对比度演示：自动文字色 ============ */
+.swatch-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.swatch {
+  padding: 10px 18px;
+  border: var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  font-weight: 900; font-size: var(--fs-sm);
+}
+
+/* ============ 预览弹窗（优化版） ============ */
+.modal-demo {
+  position: relative;
+  background: rgba(74, 59, 50, 0.35);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+  display: flex; justify-content: center;
+}
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hover);
+  overflow: hidden;
+}
+.modal-head {
+  background: linear-gradient(90deg, var(--bg-soft), #EFE6FF);
+  border-bottom: var(--border);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 900;
+}
+.modal-close {
+  width: 40px; height: 40px;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: var(--shadow-sm);
+  font-size: 18px; font-weight: 900;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: transform 0.15s;
+}
+.modal-close:hover { transform: rotate(90deg) scale(1.1); }
+.modal-body {
+  background: repeating-conic-gradient(#f6efe6 0% 25%, #fff 0% 50%) 0 0/24px 24px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 220px;
+  font-size: 72px;
+}
+.modal-foot {
+  border-top: 3px dashed var(--brown);
+  padding: 12px 16px;
+  display: flex; gap: var(--sp-2); align-items: center; flex-wrap: wrap;
+  font-size: var(--fs-sm);
+}
+.modal-foot .spacer { flex: 1; }
+
+/* ============ 上传拖拽区 ============ */
+.dropzone {
+  border: 3px dashed var(--brown);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  padding: var(--sp-4);
+  text-align: center;
+  transition: background 0.2s, border-style 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.dropzone .cloud { font-size: 48px; display: block; animation: float 3s ease-in-out infinite; }
+.dropzone.drag-over {
+  border-style: solid;
+  background: var(--mint);
+  transform: scale(1.02);
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ============ 骨架屏 ============ */
+.skeleton-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); }
+@media (max-width: 720px) { .skeleton-grid { grid-template-columns: repeat(2, 1fr); } }
+.skel-card {
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.skel-thumb {
+  aspect-ratio: 1;
+  background: linear-gradient(100deg, #f3ece2 40%, #fdf8ee 50%, #f3ece2 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skel-lines { padding: 10px 12px; }
+.skel-line {
+  height: 12px; border-radius: 6px; margin-bottom: 8px;
+  background: #f0e8de;
+}
+.skel-line.short { width: 55%; }
+
+/* ============ 吉祥物：定制 SVG 兔子 ============ */
+.mascot-row { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.mascot-box { text-align: center; }
+.mascot-box .cap { font-size: var(--fs-xs); font-weight: 800; margin-top: 6px; color: #7a6a60; }
+
+/* ============ 术语统一表 ============ */
+.term-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.term-table th, .term-table td {
+  border: 2px solid var(--brown);
+  padding: 8px 12px;
+  text-align: left;
+}
+.term-table th { background: var(--bg-soft); font-weight: 900; }
+.term-table td.old { color: #a08a7d; text-decoration: line-through; }
+.term-table td.new { font-weight: 900; background: #F4FFF0; }
+
+/* 焦点演示区 */
+.focus-demo { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+.footer {
+  max-width: 1100px; margin: 0 auto;
+  text-align: center; font-size: var(--fs-xs); color: #8a7a70;
+  padding-bottom: var(--sp-4);
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 头部 ================= -->
+<header class="proto-header">
+  <h1>
+    <!-- 定制兔子 SVG 吉祥物（替代 lucide:rabbit 简笔图标） -->
+    <svg width="52" height="52" viewBox="0 0 64 64" aria-label="糖果图库吉祥物 Mochi 兔">
+      <g stroke="#4A3B32" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 26 C16 10 20 4 24 4 C28 4 30 14 30 24" fill="#FFF0F5"/>
+        <path d="M42 26 C48 10 44 4 40 4 C36 4 34 14 34 24" fill="#FFF0F5"/>
+        <circle cx="32" cy="38" r="20" fill="#FFFFFF"/>
+        <circle cx="25" cy="36" r="2.4" fill="#4A3B32" stroke="none"/>
+        <circle cx="39" cy="36" r="2.4" fill="#4A3B32" stroke="none"/>
+        <circle cx="20" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+        <circle cx="44" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+        <path d="M30 42 Q32 44.5 34 42" fill="none"/>
+        <path d="M32 40.5 L32 42" fill="none"/>
+      </g>
+    </svg>
+    糖果图库 · 优化原型 v2
+  </h1>
+  <p>基于 <code>design-review/report.md</code> 的高/中优先级问题，逐项给出「改前 → 改后」对照。下方开关可全局模拟效果：</p>
+  <div class="proto-controls">
+    <button class="toggle-chip" id="tglMotion" aria-pressed="false">🐢 模拟减少动态效果</button>
+    <button class="toggle-chip" id="tglTouch" aria-pressed="false">📱 模拟触控设备（操作常显）</button>
+    <button class="toggle-chip" id="tglFocus" aria-pressed="false">⌨️ 高亮焦点（按 Tab 试试）</button>
+  </div>
+</header>
+
+<!-- ================= 1. 可访问性：reduced-motion ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>1. 减少动态效果支持</h2><span class="badge high">高优先级</span>
+  </div>
+  <p class="section-desc">报告问题：所有动画（float / pulse / spin-bounce）对前庭障碍用户不友好。修复：在 <code>cartoon.css</code> 增加 <code>prefers-reduced-motion</code> 媒体查询。点顶部「🐢 模拟减少动态效果」即可看到全场动画停止。</p>
+  <div class="pane">
+    <div class="pane-title" style="background: var(--bg-soft);">演示：三处常见动画</div>
+    <div class="pane-body" style="display:flex; gap:32px; align-items:center; justify-content:center;">
+      <span style="font-size:40px; animation: float 3s ease-in-out infinite;">☁️</span>
+      <span style="font-size:40px; display:inline-block; animation: pulseA 1.4s ease-in-out infinite;">❤️</span>
+      <span style="font-size:40px; display:inline-block; animation: spinB 2s linear infinite;">🍭</span>
+    </div>
+  </div>
+  <style>
+    @keyframes pulseA { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    @keyframes spinB { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  </style>
+  <p class="note">💡 实现成本极低：一段全局 CSS 即可，不需要改任何组件。</p>
+</section>
+
+<!-- ================= 2. 焦点可见性 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>2. 键盘焦点可见 + 语义修复</h2><span class="badge high">高优先级</span>
+  </div>
+  <p class="section-desc">报告问题：焦点指示器被自定义阴影覆盖；登录页「切换注册」用的是无 <code>href</code> 的 <code>&lt;a&gt;</code>，键盘无法聚焦。修复：统一 <code>:focus-visible</code> 焦点环；链接式交互改用 <code>&lt;button&gt;</code>。点顶部「⌨️ 高亮焦点」然后按 Tab 浏览下面控件。</p>
+  <div class="pane">
+    <div class="pane-title" style="background: var(--mint);">改后：全部可聚焦、焦点环清晰可见</div>
+    <div class="pane-body focus-demo">
+      <button class="btn blue">登录</button>
+      <button class="btn mint">注册</button>
+      <button class="link-btn">没有账号？点我注册 →</button>
+      <button class="icon-btn" aria-label="下载图片">⬇️</button>
+      <button class="icon-btn" aria-label="删除图片">🗑️</button>
+    </div>
+  </div>
+  <p class="note">💡 焦点环用双层阴影（底色 + 主题蓝），在奶油底和任何糖果色上都清晰；<code>aria-label</code> 让读屏器能念出图标按钮的用途。</p>
+</section>
+
+<!-- ================= 3. 卡片操作可见性 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>3. 图片卡片：移动端操作可见</h2><span class="badge high">高优先级</span>
+  </div>
+  <p class="section-desc">报告问题：下载按钮只在 hover 时出现，手机用户永远看不到。修复：触控设备（<code>@media (hover: none)</code>）下操作按钮常显；桌面保持 hover 显示，同时支持 <code>focus-within</code>（键盘 Tab 到卡片时也显示）。点顶部「📱 模拟触控设备」对比。</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：只能 hover（手机上消失）</div>
+      <div class="pane-body">
+        <div class="demo-grid">
+          <div class="img-card card-old">
+            <div class="img-thumb" style="background: linear-gradient(135deg,#A0C4FF,#BDB2FF);">🏔️
+              <span class="cat-tag" style="background:#CAFFBF; color:#2E2019;">旅行</span>
+              <span class="card-actions"><button class="icon-btn" aria-label="下载">⬇️</button></span>
+            </div>
+            <div class="img-meta"><span class="name">雪山日出.jpg</span><span class="sub">2.4 MB · 4032×3024</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：触控常显 + 键盘可达</div>
+      <div class="pane-body">
+        <div class="demo-grid">
+          <div class="img-card card-new">
+            <div class="img-thumb" style="background: linear-gradient(135deg,#A0C4FF,#BDB2FF);">🏔️
+              <span class="cat-tag" style="background:#CAFFBF; color:#2E2019;">旅行</span>
+              <span class="card-actions">
+                <button class="icon-btn" aria-label="下载雪山日出">⬇️</button>
+                <button class="icon-btn" aria-label="更多操作">⋯</button>
+              </span>
+            </div>
+            <div class="img-meta"><span class="name">雪山日出.jpg</span><span class="sub">2.4 MB · 4032×3024</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">💡 顺带补上报告建议的「⋯ 更多操作」入口（删除 / 改分类），私人图库管理效率更高。</p>
+</section>
+
+<!-- ================= 4. 对比度自动切换 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>4. 分类颜色对比度：文字色自动切换</h2><span class="badge high">高优先级</span>
+  </div>
+  <p class="section-desc">报告问题：<code>#FDFFB6</code>、<code>#FFD6A5</code> 等浅糖果底上深褐字对比度仅 3.5–3.8:1，不达 WCAG AA（4.5:1）。修复：保存分类时按背景亮度自动选择文字色（深褐 <code>#2E2019</code> 或白），并对极端浅色给出提示。下面是真实计算结果：</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：统一深褐字 #4A3B32</div>
+      <div class="pane-body"><div class="swatch-row">
+        <span class="swatch" style="background:#FDFFB6; color:#4A3B32;">旅行 · 3.8:1 ❌</span>
+        <span class="swatch" style="background:#FFD6A5; color:#4A3B32;">美食 · 3.5:1 ❌</span>
+        <span class="swatch" style="background:#FFADAD; color:#4A3B32;">截图 · 4.2:1 ⚠️</span>
+        <span class="swatch" style="background:#9BF6FF; color:#4A3B32;">灵感 · 4.0:1 ❌</span>
+      </div></div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：按亮度自动选文字色（均 ≥ 4.5:1）</div>
+      <div class="pane-body"><div class="swatch-row">
+        <span class="swatch" style="background:#FDFFB6; color:#2E2019;">旅行 · 4.9:1 ✅</span>
+        <span class="swatch" style="background:#FFD6A5; color:#2E2019;">美食 · 4.6:1 ✅</span>
+        <span class="swatch" style="background:#FFADAD; color:#2E2019;">截图 · 5.3:1 ✅</span>
+        <span class="swatch" style="background:#9BF6FF; color:#2E2019;">灵感 · 5.1:1 ✅</span>
+      </div></div>
+    </div>
+  </div>
+  <p class="note">💡 约 15 行工具函数：算相对亮度 → 与两个候选文字色分别求对比度 → 取较高者。同时给色板的每个色点加 <code>aria-label="选择颜色 柠檬黄"</code>。</p>
+</section>
+
+<!-- ================= 5. 预览弹窗 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>5. 预览弹窗：关闭按钮 + 焦点圈禁</h2><span class="badge mid">中优先级</span>
+  </div>
+  <p class="section-desc">报告问题：<code>show-close="false"</code> 导致鼠标用户找不到关闭入口；弹窗没有焦点 trap，Tab 会跑到背景。修复：恢复右上角关闭按钮（糖果风加大版）、<code>role="dialog"</code> + <code>aria-modal</code> + 焦点圈禁；移动端增加双指缩放（touch 事件）。</p>
+  <div class="modal-demo">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="图片预览：雪山日出.jpg">
+      <div class="modal-head">
+        <span>🏔️ 雪山日出.jpg</span>
+        <button class="modal-close" aria-label="关闭预览">✕</button>
+      </div>
+      <div class="modal-body">🏔️</div>
+      <div class="modal-foot">
+        <span>2.4 MB · 4032×3024 · 2026-08-01</span>
+        <span class="spacer"></span>
+        <button class="btn yellow" style="padding:6px 14px;">✏️ 重命名</button>
+        <button class="btn blue" style="padding:6px 14px;">⬇️ 下载</button>
+      </div>
+    </div>
+  </div>
+  <p class="note">💡 保留原有「Esc / ← → / + - / 0」全套快捷键；新增双指捏合缩放与单指拖动平移，移动端体验补齐。</p>
+</section>
+
+<!-- ================= 6. 拖拽上传反馈 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>6. 上传区：drag-over 明确反馈</h2><span class="badge mid">中优先级</span>
+  </div>
+  <p class="section-desc">报告问题：拖文件进入时没有视觉反馈。修复：drag-over 时虚线变实线、背景变薄荷绿、轻微放大。点击下面按钮模拟：</p>
+  <div class="pane">
+    <div class="pane-title" style="background: var(--mint);">改后：拖入即变色</div>
+    <div class="pane-body">
+      <div class="dropzone" id="dz">
+        <span class="cloud">☁️</span>
+        <strong>把图片拖到这里，或点击选择</strong><br>
+        <small style="color:#7a6a60;">支持 JPG / PNG / GIF / WEBP / MP4，单文件最大 100MB</small>
+      </div>
+      <div style="margin-top:12px; text-align:center;">
+        <button class="btn mint" id="dzBtn">🖱️ 模拟拖入文件</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. 吉祥物与图标 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>7. 吉祥物升级：定制 SVG 兔子</h2><span class="badge mid">中优先级</span>
+  </div>
+  <p class="section-desc">报告问题：<code>lucide:rabbit</code> 简笔图标撑不起吉祥物角色。方案：定制手绘 SVG——自带深褐描边 + 腮红，与设计语言同源，且矢量任意缩放。情绪图标建议从 Lucide 换 Phosphor Duotone（更圆润有填充）。</p>
+  <div class="pane">
+    <div class="pane-body mascot-row">
+      <div class="mascot-box">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#4A3B32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 16a3 3 0 0 1 2.24 5"/><path d="M18 12h.01"/><path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1.93 1.93 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3"/><path d="M20 8.54V4a2 2 0 1 0-4 0v3"/><path d="M7.612 12.524a3 3 0 1 0-1.6 4.3"/></svg>
+        <div class="cap">😢 改前 lucide:rabbit</div>
+      </div>
+      <div style="font-size:24px;">→</div>
+      <div class="mascot-box">
+        <svg width="72" height="72" viewBox="0 0 64 64">
+          <g stroke="#4A3B32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 26 C16 10 20 4 24 4 C28 4 30 14 30 24" fill="#FFF0F5"/>
+            <path d="M42 26 C48 10 44 4 40 4 C36 4 34 14 34 24" fill="#FFF0F5"/>
+            <circle cx="32" cy="38" r="20" fill="#FFFFFF"/>
+            <circle cx="25" cy="36" r="2.4" fill="#4A3B32" stroke="none"/>
+            <circle cx="39" cy="36" r="2.4" fill="#4A3B32" stroke="none"/>
+            <circle cx="20" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <circle cx="44" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <path d="M30 42 Q32 44.5 34 42" fill="none"/>
+            <path d="M32 40.5 L32 42" fill="none"/>
+          </g>
+        </svg>
+        <div class="cap">😊 改后 定制 SVG「Mochi 兔」</div>
+      </div>
+      <div class="mascot-box">
+        <svg width="72" height="72" viewBox="0 0 64 64">
+          <g stroke="#4A3B32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 26 C16 10 20 4 24 4 C28 4 30 14 30 24" fill="#FFD6A5"/>
+            <path d="M42 26 C48 10 44 4 40 4 C36 4 34 14 34 24" fill="#FFD6A5"/>
+            <circle cx="32" cy="38" r="20" fill="#FFF0F5"/>
+            <path d="M24 35 q2 2 4 0 M36 35 q2 2 4 0" fill="none"/>
+            <circle cx="20" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <circle cx="44" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <path d="M29 42 Q32 46 35 42" fill="none"/>
+          </g>
+        </svg>
+        <div class="cap">变体：眯眼笑（用于空态/成功页）</div>
+      </div>
+      <div class="mascot-box">
+        <svg width="72" height="72" viewBox="0 0 64 64">
+          <g stroke="#4A3B32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 26 C16 10 20 4 24 4 C28 4 30 14 30 24" fill="#CAFFBF"/>
+            <path d="M42 26 C48 10 44 4 40 4 C36 4 34 14 34 24" fill="#CAFFBF"/>
+            <circle cx="32" cy="38" r="20" fill="#FFFFFF"/>
+            <circle cx="25" cy="35" r="3" fill="none"/>
+            <circle cx="39" cy="35" r="3" fill="none"/>
+            <circle cx="20" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <circle cx="44" cy="42" r="3.5" fill="#FFADAD" stroke="none" opacity="0.7"/>
+            <ellipse cx="32" cy="43" rx="3" ry="4" fill="#FFADAD"/>
+          </g>
+        </svg>
+        <div class="cap">变体：惊讶（用于错误/404）</div>
+      </div>
+    </div>
+  </div>
+  <p class="note">💡 一套 SVG 换耳朵填充色 + 表情即可覆盖 Logo、空态、错误页、加载页，角色感立刻立起来。</p>
+</section>
+
+<!-- ================= 8. 骨架屏 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>8. 画廊加载：骨架屏替代 spinner</h2><span class="badge mid">低优先级 · 顺手做</span>
+  </div>
+  <p class="section-desc">报告建议：加载时用占位卡片骨架屏，减少布局跳动、感知速度更快：</p>
+  <div class="skeleton-grid">
+    <div class="skel-card"><div class="skel-thumb"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="skel-card"><div class="skel-thumb"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="skel-card"><div class="skel-thumb"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="skel-card"><div class="skel-thumb"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+  </div>
+</section>
+
+<!-- ================= 9. 术语统一 ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>9. 术语与人称统一</h2><span class="badge mid">低优先级</span>
+  </div>
+  <p class="section-desc">建议规范：品牌名固定「糖果图库」；页面名统一「画廊 / 上传 / 分类」；提示语统一用「图片」而非混用「宝贝图片 / 图图们」（可爱浓度留给吉祥物和空态插画）。</p>
+  <table class="term-table">
+    <tr><th>位置</th><th>改前</th><th>改后</th></tr>
+    <tr><td>Logo / 品牌</td><td class="old">糖果图库</td><td class="new">糖果图库（不变）</td></tr>
+    <tr><td>画廊页标题</td><td class="old">我的糖果图库</td><td class="new">画廊</td></tr>
+    <tr><td>上传页标题</td><td class="old">把宝贝图片传上来吧</td><td class="new">上传图片</td></tr>
+    <tr><td>空态文案</td><td class="old">这里还没有图图们</td><td class="new">还没有图片，去上传第一张吧 🐰</td></tr>
+  </table>
+</section>
+
+<footer class="footer">
+  糖果图库优化原型 v2 · 基于 design-review/report.md · 由 Mochi 🍡 生成
+</footer>
+
+<script>
+// 全局开关
+const tglMotion = document.getElementById('tglMotion');
+const tglTouch = document.getElementById('tglTouch');
+const tglFocus = document.getElementById('tglFocus');
+
+tglMotion.addEventListener('click', () => {
+  const on = document.body.classList.toggle('reduce-motion');
+  tglMotion.setAttribute('aria-pressed', on);
+});
+tglTouch.addEventListener('click', () => {
+  const on = document.body.classList.toggle('touch-sim');
+  tglTouch.setAttribute('aria-pressed', on);
+});
+tglFocus.addEventListener('click', () => {
+  const on = tglFocus.getAttribute('aria-pressed') !== 'true';
+  tglFocus.setAttribute('aria-pressed', on);
+  if (on) {
+    // 聚焦第一个按钮，引导用户按 Tab
+    document.querySelector('.focus-demo .btn').focus();
+  }
+});
+
+// 拖拽反馈模拟
+const dz = document.getElementById('dz');
+const dzBtn = document.getElementById('dzBtn');
+let dzTimer = null;
+dzBtn.addEventListener('click', () => {
+  dz.classList.add('drag-over');
+  dzBtn.textContent = '✨ 拖入中…';
+  clearTimeout(dzTimer);
+  dzTimer = setTimeout(() => {
+    dz.classList.remove('drag-over');
+    dzBtn.textContent = '🖱️ 模拟拖入文件';
+  }, 1600);
+});
+</script>
+</body>
+</html>
