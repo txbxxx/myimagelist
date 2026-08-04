@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果图库 · 配色与组件精修对比</title>
+<style>
+  /* ============ 全局基底（不带主题色，靠 .theme-* 注入） ============ */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f0ead6; color: #333;
+  }
+  ::-webkit-scrollbar { width: 12px; }
+  ::-webkit-scrollbar-track { background: #eee; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+  /* ============ 主题 token（4 套） ============ */
+  .theme-classic {
+    --bg:#FFF9E6; --surface:#FFFFFF; --surface-2:#FFF0F5;
+    --ink:#3E2723; --ink-soft:#7A675A; --line:#4A3B32; --shadow:#4A3B32;
+    --accent:#A0C4FF; --accent-2:#FFADAD; --accent-3:#CAFFBF; --accent-4:#BDB2FF; --warm:#FFD6A5;
+    --dot:#FFF9E6;
+  }
+  .theme-macaron {
+    --bg:#FBF6EE; --surface:#FFFFFF; --surface-2:#F4ECDF;
+    --ink:#5C4A3D; --ink-soft:#9A8674; --line:#7A6657; --shadow:#BFAE9B;
+    --accent:#B5E3CE; --accent-2:#F6C6D4; --accent-3:#C9BFE8; --accent-4:#F4E2A1; --warm:#E8C9A8;
+    --dot:#FBF6EE;
+  }
+  .theme-night {
+    --bg:#241F33; --surface:#332E48; --surface-2:#3C3658;
+    --ink:#F4F1FF; --ink-soft:#B5AED8; --line:#E8E3FF; --shadow:#0E0A1A;
+    --accent:#FF6B9D; --accent-2:#4ECDC4; --accent-3:#A06CD5; --accent-4:#FFE66D; --warm:#FF9F6B;
+    --dot:#241F33;
+  }
+  .theme-mono {
+    --bg:#FFFBF5; --surface:#FFFFFF; --surface-2:#F4EEE4;
+    --ink:#3A332E; --ink-soft:#857A6D; --line:#3A332E; --shadow:#3A332E;
+    --accent:#FF8C61; --accent-2:#FFB59A; --accent-3:#FFD8C6; --accent-4:#6B5D52; --warm:#FFA37A;
+    --dot:#FFFBF5;
+  }
+
+  /* ============ 页头 ============ */
+  .page-head {
+    text-align:center; padding: 40px 20px 30px;
+    background: linear-gradient(180deg, #FFFBE6, #FFF0F5);
+    border-bottom: 3px solid #4A3B32;
+  }
+  .page-head .emo { font-size: 50px; display:inline-block; }
+  .page-head h1 { margin: 6px 0 8px; font-size: 30px; font-weight: 900; color: #3E2723; }
+  .page-head p { margin: 0; color: #6B5848; font-weight: 700; font-size: 14px; }
+  .page-head .legend {
+    margin-top: 14px; display: inline-flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    font-size: 12px; font-weight: 800; color: #6B5848;
+  }
+  .page-head .legend span { padding: 4px 12px; background: #fff; border: 2px solid #4A3B32; border-radius: 999px; box-shadow: 2px 2px 0 #4A3B32; }
+
+  /* ============ 每个 theme section ============ */
+  .theme-section { padding: 36px 28px 44px; }
+  .theme-section + .theme-section { border-top: 3px dashed rgba(0,0,0,.12); }
+  .theme-night + .theme-section { border-top-color: rgba(255,255,255,.12); }
+
+  .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .sec-head .num {
+    width: 42px; height: 42px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900;
+    background: var(--accent); color: var(--ink);
+    border: 2.5px solid var(--line); border-radius: 14px;
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+  .sec-head h2 { margin: 0; font-size: 22px; font-weight: 900; color: var(--ink); }
+  .sec-head .desc { margin: 2px 0 0; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+  .sec-head .swatches { display: flex; gap: 6px; margin-left: auto; }
+  .sec-head .swatches i {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2.5px solid var(--line); box-shadow: 2px 2px 0 var(--shadow); display: inline-block;
+  }
+  .sec-head .swatches i:nth-child(1){ background: var(--accent); }
+  .sec-head .swatches i:nth-child(2){ background: var(--accent-2); }
+  .sec-head .swatches i:nth-child(3){ background: var(--accent-3); }
+  .sec-head .swatches i:nth-child(4){ background: var(--accent-4); }
+  .sec-head .swatches i:nth-child(5){ background: var(--warm); }
+
+  /* 组件展示区：两列 */
+  .stage {
+    display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px;
+  }
+  @media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+  .stage-col { display: flex; flex-direction: column; gap: 18px; }
+  .block-label {
+    font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: -8px;
+  }
+
+  /* ============ 精修组件（共用，靠 var 上色） ============ */
+  /* 顶栏 */
+  .pk-top {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 16px; background: var(--surface);
+    border: 2.5px solid var(--line); border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--shadow);
+  }
+  .pk-logo { display: flex; align-items: center; gap: 7px; font-size: 18px; font-weight: 900; color: var(--ink); }
+  .pk-logo .e { font-size: 22px; }
+  .pk-nav { display: flex; gap: 7px; }
+  .pk-nav a {
+    text-decoration: none; padding: 6px 14px; font-size: 13px; font-weight: 800;
+    color: var(--ink); background: var(--bg); border: 2.5px solid var(--line);
+    border-radius: 999px; box-shadow: 2px 2px 0 var(--shadow); transition: transform .15s;
+  }
+  .pk-nav a:hover { transform: translate(-1px,-1px); }
+  .pk-nav a.on {
+    background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0)), var(--accent);
+  }
+  .pk-search {
+    flex: 1; min-width: 130px; display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; background: var(--bg);
+    border: 2.5px solid var(--line); border-radius: 999px; box-shadow: 2px 2px 0 var(--shadow);
+  }
+  .pk-search .ico { font-size: 13px; opacity: .6; color: var(--ink); }
+  .pk-search span { font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+  .pk-user {
+    display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--ink);
+    padding: 4px 10px 4px 6px; background: var(--bg);
+    border: 2.5px solid var(--line); border-radius: 999px; box-shadow: 2px 2px 0 var(--shadow);
+  }
+  .pk-user .ava { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-2); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+  /* 按钮 */
+  .pk-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pk-btn {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    padding: 8px 18px; font-size: 13px; font-weight: 800; color: var(--ink);
+    background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0)), var(--accent);
+    border: 2.5px solid var(--line); border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--shadow); transition: transform .15s, box-shadow .15s;
+  }
+  .pk-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--shadow); }
+  .pk-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--shadow); }
+  .pk-btn.success { background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0)), var(--accent-3); }
+  .pk-btn.danger  { background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0)), var(--accent-2); }
+  .pk-btn.ghost   { background: var(--bg); }
+
+  /* chip */
+  .pk-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .pk-chip {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    padding: 5px 13px; font-size: 12px; font-weight: 800; color: var(--ink);
+    background: var(--surface); border: 2.5px solid var(--line);
+    border-radius: 999px; box-shadow: 2px 2px 0 var(--shadow); transition: transform .15s;
+  }
+  .pk-chip:hover { transform: translate(-1px,-1px); }
+  .pk-chip.on { background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0)), var(--accent-4); }
+  .pk-chip i { font-style: normal; font-size: 10px; padding: 0 6px; border-radius: 999px; background: rgba(0,0,0,.08); }
+  .theme-night .pk-chip i { background: rgba(255,255,255,.18); }
+
+  /* 卡片网格 */
+  .pk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .pk-card {
+    border: 2.5px solid var(--line); border-radius: 14px; overflow: hidden;
+    background: var(--surface); box-shadow: 3px 3px 0 var(--shadow);
+    transition: transform .18s, box-shadow .18s; cursor: pointer;
+  }
+  .pk-card:hover { transform: translate(-3px,-3px) rotate(-.6deg); box-shadow: 6px 6px 0 var(--shadow); }
+  .pk-card .thumb {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-size: 30px; position: relative;
+  }
+  .pk-card .thumb.g1 { background: linear-gradient(135deg, var(--accent), var(--accent-3)); }
+  .pk-card .thumb.g2 { background: linear-gradient(135deg, var(--accent-2), var(--warm)); }
+  .pk-card .thumb.g3 { background: linear-gradient(135deg, var(--accent-4), var(--accent-2)); }
+  .pk-card .badge {
+    position: absolute; top: 6px; left: 6px; padding: 2px 8px; font-size: 9px; font-weight: 900; color: #fff;
+    background: rgba(0,0,0,.45); border: 2px solid var(--line); border-radius: 999px; box-shadow: 1px 1px 0 var(--shadow);
+  }
+  .pk-card .foot { padding: 8px 10px 10px; }
+  .pk-card .name { font-size: 12px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pk-card .meta { font-size: 10px; font-weight: 700; color: var(--ink-soft); margin-top: 2px; }
+
+  /* 弹窗缩略 */
+  .pk-dialog {
+    border: 2.5px solid var(--line); border-radius: 16px; overflow: hidden;
+    background: var(--surface); box-shadow: 5px 5px 0 var(--shadow);
+  }
+  .pk-dialog .dh {
+    padding: 10px 14px; font-size: 13px; font-weight: 900; color: var(--ink);
+    background: linear-gradient(180deg, var(--surface-2), var(--bg));
+    border-bottom: 2.5px solid var(--line);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pk-dialog .dh .pill { margin-left: auto; padding: 2px 10px; font-size: 10px; font-weight: 900; background: var(--accent-4); border: 2px solid var(--line); border-radius: 999px; }
+  .pk-dialog .db { padding: 14px; display: flex; align-items: center; justify-content: center; }
+  .pk-dialog .db .preview {
+    width: 100%; height: 110px; border-radius: 10px; border: 2.5px solid var(--line);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 3px 3px 0 var(--shadow);
+    display: flex; align-items: center; justify-content: center; font-size: 32px;
+  }
+  .pk-dialog .df { padding: 10px 14px; display: flex; gap: 8px; justify-content: flex-end; border-top: 2px dashed var(--line); }
+
+  /* footer 说明 */
+  .page-foot {
+    text-align: center; padding: 28px 20px 50px; background: #FFFBE6; border-top: 3px solid #4A3B32;
+    font-size: 13px; font-weight: 700; color: #6B5848; line-height: 1.8;
+  }
+  .page-foot b { color: #3E2723; }
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <span class="emo">🎨</span>
+    <h1>配色方案 · 组件精修对比</h1>
+    <p>三种视图（密集 / 瀑布 / 时刻）会做成切换器都保留 · 下面挑你喜欢的<b>配色风格</b></p>
+    <div class="legend">
+      <span>① 经典糖果精修</span>
+      <span>② 柔和马卡龙</span>
+      <span>③ 暗夜糖果</span>
+      <span>④ 清爽单主色</span>
+    </div>
+  </div>
+
+  <!-- ========== Theme 1 经典糖果精修 ========== -->
+  <section class="theme-section theme-classic">
+    <div class="sec-head">
+      <div class="num">①</div>
+      <div>
+        <h2>经典糖果 · 精修版</h2>
+        <p class="desc">当前色系基础上统一色阶、加深阴影层次、按钮加高光，最稳妥不踩雷</p>
+      </div>
+      <div class="swatches"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="stage">
+      <div class="stage-col">
+        <div class="pk-top">
+          <div class="pk-logo"><span class="e">🐰</span>糖果图库</div>
+          <div class="pk-nav"><a class="on">画廊</a><a>上传</a><a>分类</a></div>
+          <div class="pk-search"><span class="ico">🔍</span><span>搜索照片…</span></div>
+          <div class="pk-user"><span class="ava">🐰</span>小兔子</div>
+        </div>
+        <div><div class="block-label">按钮</div>
+          <div class="pk-btns">
+            <button class="pk-btn">⬇ 下载</button>
+            <button class="pk-btn success">✔ 保存</button>
+            <button class="pk-btn danger">🗑 删除</button>
+            <button class="pk-btn ghost">重命名</button>
+          </div>
+        </div>
+        <div><div class="block-label">分类筛选</div>
+          <div class="pk-chips">
+            <span class="pk-chip on">⭐ 全部 <i>128</i></span>
+            <span class="pk-chip">● 旅行 <i>32</i></span>
+            <span class="pk-chip">● 美食 <i>24</i></span>
+            <span class="pk-chip">● 宠物 <i>18</i></span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-col">
+        <div><div class="block-label">图片卡片</div>
+          <div class="pk-grid">
+            <div class="pk-card"><div class="thumb g1">🌅<span class="badge">旅行</span></div><div class="foot"><div class="name">海边日落.jpg</div><div class="meta">2.1MB · 08-03</div></div></div>
+            <div class="pk-card"><div class="thumb g2">🍰<span class="badge">美食</span></div><div class="foot"><div class="name">下午茶.jpg</div><div class="meta">920KB · 08-01</div></div></div>
+            <div class="pk-card"><div class="thumb g3">🐰<span class="badge">宠物</span></div><div class="foot"><div class="name">小兔子.gif</div><div class="meta">1.1MB · 08-02</div></div></div>
+          </div>
+        </div>
+        <div><div class="block-label">预览弹窗</div>
+          <div class="pk-dialog">
+            <div class="dh">🖼️ 海边日落.jpg <span class="pill">2 / 128</span></div>
+            <div class="db"><div class="preview">🌅</div></div>
+            <div class="df"><button class="pk-btn ghost">重命名</button><button class="pk-btn">⬇ 原图</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Theme 2 柔和马卡龙 ========== -->
+  <section class="theme-section theme-macaron">
+    <div class="sec-head">
+      <div class="num">②</div>
+      <div>
+        <h2>柔和马卡龙</h2>
+        <p class="desc">奶油底 + 低饱和薄荷/樱花/淡紫，描边阴影换成暖灰棕，治愈不刺眼</p>
+      </div>
+      <div class="swatches"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="stage">
+      <div class="stage-col">
+        <div class="pk-top">
+          <div class="pk-logo"><span class="e">🐰</span>糖果图库</div>
+          <div class="pk-nav"><a class="on">画廊</a><a>上传</a><a>分类</a></div>
+          <div class="pk-search"><span class="ico">🔍</span><span>搜索照片…</span></div>
+          <div class="pk-user"><span class="ava">🐰</span>小兔子</div>
+        </div>
+        <div><div class="block-label">按钮</div>
+          <div class="pk-btns">
+            <button class="pk-btn">⬇ 下载</button>
+            <button class="pk-btn success">✔ 保存</button>
+            <button class="pk-btn danger">🗑 删除</button>
+            <button class="pk-btn ghost">重命名</button>
+          </div>
+        </div>
+        <div><div class="block-label">分类筛选</div>
+          <div class="pk-chips">
+            <span class="pk-chip on">⭐ 全部 <i>128</i></span>
+            <span class="pk-chip">● 旅行 <i>32</i></span>
+            <span class="pk-chip">● 美食 <i>24</i></span>
+            <span class="pk-chip">● 宠物 <i>18</i></span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-col">
+        <div><div class="block-label">图片卡片</div>
+          <div class="pk-grid">
+            <div class="pk-card"><div class="thumb g1">🌅<span class="badge">旅行</span></div><div class="foot"><div class="name">海边日落.jpg</div><div class="meta">2.1MB · 08-03</div></div></div>
+            <div class="pk-card"><div class="thumb g2">🍰<span class="badge">美食</span></div><div class="foot"><div class="name">下午茶.jpg</div><div class="meta">920KB · 08-01</div></div></div>
+            <div class="pk-card"><div class="thumb g3">🐰<span class="badge">宠物</span></div><div class="foot"><div class="name">小兔子.gif</div><div class="meta">1.1MB · 08-02</div></div></div>
+          </div>
+        </div>
+        <div><div class="block-label">预览弹窗</div>
+          <div class="pk-dialog">
+            <div class="dh">🖼️ 海边日落.jpg <span class="pill">2 / 128</span></div>
+            <div class="db"><div class="preview">🌅</div></div>
+            <div class="df"><button class="pk-btn ghost">重命名</button><button class="pk-btn">⬇ 原图</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Theme 3 暗夜糖果 ========== -->
+  <section class="theme-section theme-night">
+    <div class="sec-head">
+      <div class="num">③</div>
+      <div>
+        <h2>暗夜糖果</h2>
+        <p class="desc">深紫底 + 霓虹糖果色，浅色描边发光 + 纯黑硬阴影，酷感现代、夜间护眼</p>
+      </div>
+      <div class="swatches"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="stage">
+      <div class="stage-col">
+        <div class="pk-top">
+          <div class="pk-logo"><span class="e">🐰</span>糖果图库</div>
+          <div class="pk-nav"><a class="on">画廊</a><a>上传</a><a>分类</a></div>
+          <div class="pk-search"><span class="ico">🔍</span><span>搜索照片…</span></div>
+          <div class="pk-user"><span class="ava">🐰</span>小兔子</div>
+        </div>
+        <div><div class="block-label">按钮</div>
+          <div class="pk-btns">
+            <button class="pk-btn">⬇ 下载</button>
+            <button class="pk-btn success">✔ 保存</button>
+            <button class="pk-btn danger">🗑 删除</button>
+            <button class="pk-btn ghost">重命名</button>
+          </div>
+        </div>
+        <div><div class="block-label">分类筛选</div>
+          <div class="pk-chips">
+            <span class="pk-chip on">⭐ 全部 <i>128</i></span>
+            <span class="pk-chip">● 旅行 <i>32</i></span>
+            <span class="pk-chip">● 美食 <i>24</i></span>
+            <span class="pk-chip">● 宠物 <i>18</i></span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-col">
+        <div><div class="block-label">图片卡片</div>
+          <div class="pk-grid">
+            <div class="pk-card"><div class="thumb g1">🌅<span class="badge">旅行</span></div><div class="foot"><div class="name">海边日落.jpg</div><div class="meta">2.1MB · 08-03</div></div></div>
+            <div class="pk-card"><div class="thumb g2">🍰<span class="badge">美食</span></div><div class="foot"><div class="name">下午茶.jpg</div><div class="meta">920KB · 08-01</div></div></div>
+            <div class="pk-card"><div class="thumb g3">🐰<span class="badge">宠物</span></div><div class="foot"><div class="name">小兔子.gif</div><div class="meta">1.1MB · 08-02</div></div></div>
+          </div>
+        </div>
+        <div><div class="block-label">预览弹窗</div>
+          <div class="pk-dialog">
+            <div class="dh">🖼️ 海边日落.jpg <span class="pill">2 / 128</span></div>
+            <div class="db"><div class="preview">🌅</div></div>
+            <div class="df"><button class="pk-btn ghost">重命名</button><button class="pk-btn">⬇ 原图</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Theme 4 清爽单主色 ========== -->
+  <section class="theme-section theme-mono">
+    <div class="sec-head">
+      <div class="num">④</div>
+      <div>
+        <h2>清爽单主色</h2>
+        <p class="desc">蜜桃橙单一主色 + 中性奶白，克制干净，描边硬阴影保留卡通味但更专业</p>
+      </div>
+      <div class="swatches"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="stage">
+      <div class="stage-col">
+        <div class="pk-top">
+          <div class="pk-logo"><span class="e">🐰</span>糖果图库</div>
+          <div class="pk-nav"><a class="on">画廊</a><a>上传</a><a>分类</a></div>
+          <div class="pk-search"><span class="ico">🔍</span><span>搜索照片…</span></div>
+          <div class="pk-user"><span class="ava">🐰</span>小兔子</div>
+        </div>
+        <div><div class="block-label">按钮</div>
+          <div class="pk-btns">
+            <button class="pk-btn">⬇ 下载</button>
+            <button class="pk-btn success">✔ 保存</button>
+            <button class="pk-btn danger">🗑 删除</button>
+            <button class="pk-btn ghost">重命名</button>
+          </div>
+        </div>
+        <div><div class="block-label">分类筛选</div>
+          <div class="pk-chips">
+            <span class="pk-chip on">⭐ 全部 <i>128</i></span>
+            <span class="pk-chip">● 旅行 <i>32</i></span>
+            <span class="pk-chip">● 美食 <i>24</i></span>
+            <span class="pk-chip">● 宠物 <i>18</i></span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-col">
+        <div><div class="block-label">图片卡片</div>
+          <div class="pk-grid">
+            <div class="pk-card"><div class="thumb g1">🌅<span class="badge">旅行</span></div><div class="foot"><div class="name">海边日落.jpg</div><div class="meta">2.1MB · 08-03</div></div></div>
+            <div class="pk-card"><div class="thumb g2">🍰<span class="badge">美食</span></div><div class="foot"><div class="name">下午茶.jpg</div><div class="meta">920KB · 08-01</div></div></div>
+            <div class="pk-card"><div class="thumb g3">🐰<span class="badge">宠物</span></div><div class="foot"><div class="name">小兔子.gif</div><div class="meta">1.1MB · 08-02</div></div></div>
+          </div>
+        </div>
+        <div><div class="block-label">预览弹窗</div>
+          <div class="pk-dialog">
+            <div class="dh">🖼️ 海边日落.jpg <span class="pill">2 / 128</span></div>
+            <div class="db"><div class="preview">🌅</div></div>
+            <div class="df"><button class="pk-btn ghost">重命名</button><button class="pk-btn">⬇ 原图</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-foot">
+    <p>挑一套你喜欢的配色（或告诉我把某两套混一下）· 三种视图切换器会沿用你选的这套配色</p>
+    <p style="margin-top:8px"><b>打开方式：</b>直接双击此文件，或与另三版原型同目录浏览</p>
+  </div>
+</body>
+</html>

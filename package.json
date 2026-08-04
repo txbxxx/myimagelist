@@ -1,0 +1,15 @@
+{
+  "name": "my-photo-gallery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "一个卡通风格的前后端在线图库应用",
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "dev": "concurrently -n SERVER,CLIENT -c yellow,cyan \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

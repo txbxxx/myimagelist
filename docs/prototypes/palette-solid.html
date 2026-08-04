@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果图库 · 卡通配色原则与纯色方案</title>
+<link rel="stylesheet" href="_cartoon.css" />
+<style>
+  /* ===== 纯色方案专用（覆盖 _cartoon 的渐变习惯，全部纯色） ===== */
+  :root {
+    --skel: #4A3B32;        /* 骨架：描边+阴影+深文字 三合一 */
+    --ink: #3E2723;
+    --ink-soft: #7A675A;
+    --bg: #FFF9E6;
+    --surface: #FFFFFF;
+    --c-main: #A0C4FF;      /* 主色：冷色天蓝，让位照片 */
+    --c-ok:   #CAFFBF;
+    --c-danger:#FFADAD;
+    --c-warn: #FDFFB6;
+    --c-purple:#BDB2FF;
+    --c-peach: #FFD6A5;
+    --shadow: 4px 4px 0 var(--skel);
+    --shadow-sm: 2px 2px 0 var(--skel);
+    --line: 2.5px solid var(--skel);
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 30px 20px 70px; }
+
+  .head { text-align:center; margin-bottom: 28px; }
+  .head .emo { font-size: 50px; display:inline-block; animation: float 3s ease-in-out infinite; }
+  .head h1 { margin: 6px 0 6px; font-size: 28px; font-weight: 900; color: var(--ink); }
+  .head p { margin: 0; color: var(--ink-soft); font-weight: 700; font-size: 14px; }
+
+  /* ===== 原则卡片 ===== */
+  .rules { display:grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 36px; }
+  @media (max-width:900px){ .rules{ grid-template-columns:1fr; } }
+  .rule {
+    background: var(--surface); border: var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 16px 18px;
+  }
+  .rule .n {
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 26px; height: 26px; font-size: 13px; font-weight: 900;
+    background: var(--c-main); color: var(--ink);
+    border: 2px solid var(--skel); border-radius: 8px; box-shadow: var(--shadow-sm);
+    margin-bottom: 8px;
+  }
+  .rule h3 { margin: 0 0 5px; font-size: 15px; font-weight: 900; color: var(--ink); }
+  .rule p { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); line-height: 1.55; }
+  .rule .demo { margin-top: 10px; display: flex; gap: 6px; align-items: center; }
+  .sw { width: 30px; height: 30px; border-radius: 8px; border: 2.5px solid var(--skel); box-shadow: 2px 2px 0 var(--skel); }
+  .sw.skel{ background: var(--skel); }
+  .sw.main{ background: var(--c-main); }
+  .sw.ok{ background: var(--c-ok); }
+  .sw.danger{ background: var(--c-danger); }
+  .sw.purple{ background: var(--c-purple); }
+  .sw.peach{ background: var(--c-peach); }
+  .bad { text-decoration: line-through; opacity: .5; }
+
+  /* ===== 色板表 ===== */
+  .panel { background: var(--surface); border: var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow:hidden; margin-bottom: 30px; }
+  .panel h2 { margin:0; padding: 13px 20px; font-size: 17px; font-weight: 900; background: var(--bg); border-bottom: var(--line); }
+  .pal-table { display:grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: #efe6d4; }
+  @media (max-width:780px){ .pal-table{ grid-template-columns: repeat(2,1fr); } }
+  .pal-cell { background: var(--surface); padding: 14px 16px; display:flex; align-items:center; gap: 12px; }
+  .pal-cell .chip-sw { width: 40px; height: 40px; border-radius: 10px; border: 2.5px solid var(--skel); box-shadow: 2px 2px 0 var(--skel); flex-shrink:0; }
+  .pal-cell .role { font-size: 12px; font-weight: 900; color: var(--ink); }
+  .pal-cell .hex { font-size: 11px; font-weight: 700; color: var(--ink-soft); margin-top: 2px; font-family: monospace; }
+
+  /* ===== 组件舞台（纯色，无渐变） ===== */
+  .stage-label { font-size: 12px; font-weight: 900; letter-spacing:1px; color: var(--ink-soft); margin: 6px 0 10px; text-transform:uppercase; }
+
+  /* 顶栏（纯色） */
+  .s-top {
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding: 12px 16px; background: var(--surface);
+    border: var(--line); border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .s-logo { font-size: 18px; font-weight: 900; color: var(--ink); display:flex; align-items:center; gap:6px; }
+  .s-nav { display:flex; gap:7px; }
+  .s-nav a {
+    text-decoration:none; padding:6px 14px; font-size:13px; font-weight:800; color:var(--ink);
+    background: var(--bg); border: var(--line); border-radius:999px; box-shadow: var(--shadow-sm);
+  }
+  .s-nav a.on { background: var(--c-main); }   /* 纯色选中，无渐变 */
+  .s-search {
+    flex:1; min-width:120px; display:flex; align-items:center; gap:6px;
+    padding:6px 14px; background:var(--bg); border:var(--line); border-radius:999px; box-shadow:var(--shadow-sm);
+    font-size:12px; font-weight:700; color:var(--ink-soft);
+  }
+  .s-user { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:var(--ink); padding:4px 12px 4px 6px; background:var(--bg); border:var(--line); border-radius:999px; box-shadow:var(--shadow-sm); }
+  .s-user .ava { width:22px; height:22px; border-radius:50%; background:var(--c-danger); border:2px solid var(--skel); }
+
+  /* 按钮（纯色） */
+  .s-btns { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 20px; }
+  .s-btn {
+    display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+    padding:9px 20px; font-size:14px; font-weight:800; color:var(--ink);
+    background: var(--c-main);          /* 纯色，无高光渐变 */
+    border: var(--line); border-radius:999px; box-shadow: var(--shadow);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .s-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--skel); }
+  .s-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--skel); }
+  .s-btn.ok { background: var(--c-ok); }
+  .s-btn.danger { background: var(--c-danger); }
+  .s-btn.warn { background: var(--c-warn); }
+  .s-btn.ghost { background: var(--bg); }
+
+  /* 分类 chip（纯色，多色仅用于分类区分） */
+  .s-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 22px; }
+  .s-chip {
+    display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+    padding:6px 14px; font-size:13px; font-weight:800; color:var(--ink);
+    background: var(--surface); border: var(--line); border-radius:999px; box-shadow: var(--shadow-sm);
+  }
+  .s-chip.on { background: var(--c-main); }
+  .s-chip .dot { width:9px; height:9px; border-radius:50%; border:2px solid var(--skel); }
+  .s-chip i { font-style:normal; font-size:11px; padding:0 7px; border-radius:999px; background: rgba(74,59,50,.12); }
+
+  /* 卡片网格（纯色缩略图，不同单色拼贴） */
+  .s-grid { display:grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  @media (max-width:900px){ .s-grid{ grid-template-columns: repeat(2,1fr); } }
+  .s-card {
+    border: var(--line); border-radius: 14px; overflow:hidden; background: var(--surface);
+    box-shadow: var(--shadow); transition: transform .18s, box-shadow .18s; cursor:pointer;
+  }
+  .s-card:hover { transform: translate(-3px,-3px) rotate(-.6deg); box-shadow: 7px 7px 0 var(--skel); }
+  .s-card .thumb {
+    aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+    font-size: 32px; position: relative;
+  }
+  /* 纯色块（每种一个单色，拼出糖果贴纸感） */
+  .t-main   { background: var(--c-main); }
+  .t-ok     { background: var(--c-ok); }
+  .t-danger { background: var(--c-danger); }
+  .t-purple { background: var(--c-purple); }
+  .t-peach  { background: var(--c-peach); }
+  .t-warn   { background: var(--c-warn); }
+  .s-card .badge {
+    position:absolute; top:7px; left:7px; padding:2px 9px; font-size:10px; font-weight:900; color:var(--ink);
+    background: rgba(255,255,255,.85); border:2px solid var(--skel); border-radius:999px; box-shadow: var(--shadow-sm);
+  }
+  .s-card .foot { padding: 9px 11px 11px; }
+  .s-card .name { font-size: 13px; font-weight: 800; color: var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .s-card .meta { font-size: 11px; font-weight: 700; color: var(--ink-soft); margin-top: 2px; }
+
+  /* 弹窗（纯色） */
+  .s-dialog { border: var(--line); border-radius: 16px; overflow:hidden; background: var(--surface); box-shadow: 6px 6px 0 var(--skel); }
+  .s-dialog .dh { padding: 12px 16px; font-size: 14px; font-weight: 900; color: var(--ink); background: var(--bg); border-bottom: var(--line); display:flex; align-items:center; gap:8px; }
+  .s-dialog .dh .pill { margin-left:auto; padding:2px 11px; font-size:11px; font-weight:900; background:var(--c-purple); border:2px solid var(--skel); border-radius:999px; }
+  .s-dialog .db { padding: 18px; }
+  .s-dialog .db .ph { width:100%; height:160px; border-radius:12px; border:var(--line); background: var(--c-main); box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; font-size: 44px; }
+  .s-dialog .df { padding: 12px 16px; display:flex; gap:8px; justify-content:flex-end; border-top: 2px dashed #e0d4c0; }
+</style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 返回对比</a>
+  <span class="proto-tag">纯色方案 · 配色原则</span>
+
+  <div class="wrap">
+    <div class="head">
+      <span class="emo">🎨</span>
+      <h1>卡通配色原则 · 纯色方案</h1>
+      <p>去掉所有渐变 · 一个骨架色贯穿 · 彩色统一明度档 · 框架冷色让位照片</p>
+    </div>
+
+    <!-- 7 条原则 -->
+    <div class="rules">
+      <div class="rule">
+        <span class="n">1</span><h3>骨架色三合一</h3>
+        <p>描边、硬阴影、深文字都用同一个深棕，元素才不散架。</p>
+        <div class="demo"><span class="sw skel"></span><span style="font-size:11px;font-weight:800;color:var(--ink-soft)">描边=阴影=文字</span></div>
+      </div>
+      <div class="rule">
+        <span class="n">2</span><h3>背景退让</h3>
+        <p>奶油暖白低饱和，让彩色按钮跳出来。背景当舞台不当演员。</p>
+        <div class="demo"><span class="sw main" style="background:var(--bg);border-color:var(--skel)"></span><span class="sw main"></span></div>
+      </div>
+      <div class="rule">
+        <span class="n">3</span><h3>纯色不渐变</h3>
+        <p>渐变是拟物语言，削弱贴纸感。纯色块+粗描边=贴纸。</p>
+        <div class="demo"><span class="sw main"></span><span class="sw bad" style="background:linear-gradient(180deg,#fff,var(--c-main))"></span></div>
+      </div>
+      <div class="rule">
+        <span class="n">4</span><h3>彩色统一明度</h3>
+        <p>所有彩色调到接近亮度，多色拼贴也成同一 family 不乱。</p>
+        <div class="demo"><span class="sw main"></span><span class="sw ok"></span><span class="sw danger"></span><span class="sw purple"></span></div>
+      </div>
+      <div class="rule">
+        <span class="n">5</span><h3>框架色 vs 分类色分工</h3>
+        <p>框架(顶栏/主按钮)克制用主色；多色只给分类标签做区分。</p>
+        <div class="demo"><span class="sw main"></span><span class="sw ok"></span><span class="sw danger"></span><span class="sw peach"></span></div>
+      </div>
+      <div class="rule">
+        <span class="n">6</span><h3>硬阴影不模糊</h3>
+        <p>4px 0 偏移无模糊，贴纸实体感。带 blur 是 material 风。</p>
+        <div class="demo"><span class="sw main"></span></div>
+      </div>
+      <div class="rule">
+        <span class="n">7</span><h3>图库主色要冷</h3>
+        <p>主体是彩色照片，UI 用冷色天蓝，不抢照片戏。</p>
+        <div class="demo"><span class="sw main"></span><span style="font-size:11px;font-weight:800;color:var(--ink-soft)">冷色 →</span></div>
+      </div>
+    </div>
+
+    <!-- 色板表 -->
+    <div class="panel">
+      <h2>📐 推荐色板（纯色）</h2>
+      <div class="pal-table">
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--skel)"></span><div><div class="role">骨架 · 描边/阴影/深文字</div><div class="hex">#4A3B32</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--bg)"></span><div><div class="role">背景 · 退让</div><div class="hex">#FFF9E6</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--surface);box-shadow:0 0 0 2px var(--skel)"></span><div><div class="role">表面 · 卡片/顶栏</div><div class="hex">#FFFFFF</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--c-main)"></span><div><div class="role">主色 · 操作/选中</div><div class="hex">#A0C4FF</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--c-ok)"></span><div><div class="role">成功 · 保存</div><div class="hex">#CAFFBF</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--c-danger)"></span><div><div class="role">危险 · 删除</div><div class="hex">#FFADAD</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:var(--c-warn)"></span><div><div class="role">警告 · 提示</div><div class="hex">#FDFFB6</div></div></div>
+        <div class="pal-cell"><span class="chip-sw" style="background:linear-gradient(90deg,var(--c-purple),var(--c-peach))"></span><div><div class="role">分类多色 · 仅标签</div><div class="hex">#BDB2FF / #FFD6A5</div></div></div>
+      </div>
+    </div>
+
+    <!-- 组件舞台 -->
+    <div class="panel" style="padding: 22px;">
+      <h2 style="margin:-22px -22px 18px; border-radius:0;">🖼️ 纯色组件效果</div>
+
+      <div class="stage-label">顶栏（纯白表面 + 主色选中态）</div>
+      <div class="s-top">
+        <div class="s-logo">🐰 糖果图库</div>
+        <div class="s-nav"><a class="on">画廊</a><a>上传</a><a>分类</a></div>
+        <div class="s-search">🔍 搜索照片…</div>
+        <div class="s-user"><span class="ava"></span>小兔子</div>
+      </div>
+
+      <div class="stage-label">按钮（纯色填充 · 文字深棕保证对比）</div>
+      <div class="s-btns">
+        <button class="s-btn">⬇ 下载</button>
+        <button class="s-btn ok">✔ 保存</button>
+        <button class="s-btn danger">🗑 删除</button>
+        <button class="s-btn warn">⚠ 提示</button>
+        <button class="s-btn ghost">重命名</button>
+      </div>
+
+      <div class="stage-label">分类筛选（多色仅用于区分分类 · 框架仍是主色蓝）</div>
+      <div class="s-chips">
+        <span class="s-chip on">⭐ 全部 <i>128</i></span>
+        <span class="s-chip"><span class="dot" style="background:var(--c-peach)"></span>旅行 <i>32</i></span>
+        <span class="s-chip"><span class="dot" style="background:var(--c-ok)"></span>美食 <i>24</i></span>
+        <span class="s-chip"><span class="dot" style="background:var(--c-purple)"></span>宠物 <i>18</i></span>
+        <span class="s-chip"><span class="dot" style="background:var(--c-danger)"></span>风景 <i>29</i></span>
+      </div>
+
+      <div class="stage-label">图片卡片（纯色缩略图拼贴 · 角标用半透明白）</div>
+      <div class="s-grid">
+        <div class="s-card"><div class="thumb t-main">🌅<span class="badge">旅行</span></div><div class="foot"><div class="name">海边日落.jpg</div><div class="meta">2.1MB · 08-03</div></div></div>
+        <div class="s-card"><div class="thumb t-ok">🍰<span class="badge">美食</span></div><div class="foot"><div class="name">下午茶.jpg</div><div class="meta">920KB · 08-01</div></div></div>
+        <div class="s-card"><div class="thumb t-purple">🐰<span class="badge">宠物</span></div><div class="foot"><div class="name">小兔.gif</div><div class="meta">1.1MB · 08-02</div></div></div>
+        <div class="s-card"><div class="thumb t-peach">🏯<span class="badge">风景</span></div><div class="foot"><div class="name">古街.png</div><div class="meta">3.3MB · 07-22</div></div></div>
+        <div class="s-card"><div class="thumb t-danger">🎈<span class="badge">日常</span></div><div class="foot"><div class="name">派对.jpg</div><div class="meta">1.5MB · 07-30</div></div></div>
+        <div class="s-card"><div class="thumb t-warn">🌻<span class="badge">风景</span></div><div class="foot"><div class="name">向日葵.jpg</div><div class="meta">780KB · 08-01</div></div></div>
+        <div class="s-card"><div class="thumb t-main">🎬<span class="badge">视频</span></div><div class="foot"><div class="name">海边vlog.mp4</div><div class="meta">18.4MB · 00:42</div></div></div>
+        <div class="s-card"><div class="thumb t-ok">🍜<span class="badge">美食</span></div><div class="foot"><div class="name">拉面.jpg</div><div class="meta">1.4MB · 07-19</div></div></div>
+      </div>
+
+      <div class="stage-label">预览弹窗（纯色 · 主色舞台 · 硬阴影）</div>
+      <div class="s-dialog" style="max-width:560px;">
+        <div class="dh">🖼️ 海边日落.jpg <span class="pill">2 / 128</span></div>
+        <div class="db"><div class="ph">🌅</div></div>
+        <div class="df"><button class="s-btn ghost">重命名</button><button class="s-btn">⬇ 下载原图</button></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

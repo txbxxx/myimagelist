@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V1 · 时间线密集网格 — 糖果图库原型</title>
+<link rel="stylesheet" href="_cartoon.css" />
+<style>
+  /* ===== V1 版式：justified 紧密网格 ===== */
+  .v1-main { max-width: 1280px; margin: 0 auto; padding: 6px 20px 60px; }
+
+  /* justified 行：固定行高，图片按宽高比 flex-grow 铺满整行 */
+  .jrow {
+    display: flex; gap: 4px;
+    height: 200px;
+    margin-bottom: 4px;
+  }
+  .jitem {
+    position: relative; flex-basis: 0; flex-grow: var(--r, 1);
+    height: 100%;
+    border: 2.5px solid var(--brown); border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer; overflow: hidden;
+    transition: transform .15s, box-shadow .15s, filter .15s;
+  }
+  .jitem:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 4px 0 var(--brown);
+    filter: brightness(1.06) saturate(1.1);
+    z-index: 3;
+  }
+  .jitem .ph { width: 100%; height: 100%; border-radius: 7px; }
+  .jitem .ph::before { font-size: 34px; }
+
+  /* hover 工具栏（右上）—— Google Photos 风 */
+  .jitem .tools {
+    position: absolute; top: 6px; right: 6px; z-index: 4;
+    display: flex; gap: 4px; opacity: 0; transform: translateY(-4px);
+    transition: opacity .15s, transform .15s;
+  }
+  .jitem:hover .tools { opacity: 1; transform: translateY(0); }
+  .jitem .tools button {
+    width: 28px; height: 28px; font-size: 13px; cursor: pointer;
+    background: #fff; border: 2px solid var(--brown); border-radius: 50%;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center;
+    transition: all .12s;
+  }
+  .jitem .tools button:hover { background: var(--yellow); transform: scale(1.12); }
+
+  /* hover 底部渐变文件名 */
+  .jitem .cap {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+    padding: 14px 8px 5px; font-size: 11px; font-weight: 800; color: #fff;
+    background: linear-gradient(transparent, rgba(62,39,35,.78));
+    opacity: 0; transform: translateY(6px); transition: all .15s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jitem:hover .cap { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .jrow { height: 130px; }
+    .jitem .ph::before { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 返回对比</a>
+  <span class="proto-tag">V1 · Google Photos 风</span>
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo"><span class="emo">🐰</span><b>糖果图库</b></div>
+      <div class="search-box">
+        <span class="ico">🔍</span>
+        <input placeholder="搜索照片、分类、日期…" />
+      </div>
+      <div class="view-switch">
+        <button class="on" title="密集网格">▦</button>
+        <button title="瀑布流">▤</button>
+        <button title="时刻">▢</button>
+      </div>
+      <div class="user-box"><span class="ava">🐰</span>小兔子<a class="ctn-btn" style="padding:4px 12px;font-size:12px" href="#">退出</a></div>
+    </div>
+    <div class="chip-row">
+      <button class="chip on">⭐ 全部 <i>128</i></button>
+      <button class="chip"><span class="dot" style="background:#FFADAD"></span>旅行 <i>32</i></button>
+      <button class="chip"><span class="dot" style="background:#A0C4FF"></span>美食 <i>24</i></button>
+      <button class="chip"><span class="dot" style="background:#CAFFBF"></span>宠物 <i>18</i></button>
+      <button class="chip"><span class="dot" style="background:#BDB2FF"></span>风景 <i>29</i></button>
+      <button class="chip"><span class="dot" style="background:#FFD6A5"></span>日常 <i>25</i></button>
+    </div>
+  </header>
+
+  <main class="v1-main">
+    <!-- 月份分组 1 -->
+    <div class="date-pill">📅 2026 年 8 月 <span class="sub">· 42 张</span></div>
+    <div class="jrow">
+      <div class="jitem" style="--r:1.5"><div class="ph p-a" data-emo="🌅"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">海边日落.jpg</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-b" data-emo="🏯"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">古街.png</div></div></div>
+      <div class="jitem" style="--r:0.75"><div class="ph p-c" data-emo="🌳"><div class="tools"><button>⬇</button></div><div class="cap">林间小路.jpg</div></div></div>
+      <div class="jitem" style="--r:1.33"><div class="ph p-d" data-emo="🍦"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">夏日冰激凌.png</div></div></div>
+    </div>
+    <div class="jrow">
+      <div class="jitem" style="--r:0.8"><div class="ph p-e" data-emo="🐰"><div class="tools"><button>⬇</button></div><div class="cap">小兔.gif</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-f" data-emo="🍰"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">生日蛋糕.jpg</div></div></div>
+      <div class="jitem" style="--r:1.6"><div class="ph p-g" data-emo="🏞️"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">湖光山色.png</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-h" data-emo="🎈"><div class="tools"><button>⬇</button></div><div class="cap">派对.jpg</div></div></div>
+      <div class="jitem" style="--r:0.75"><div class="ph p-a" data-emo="🌻"><div class="tools"><button>⬇</button></div><div class="cap">向日葵.jpg</div></div></div>
+    </div>
+
+    <!-- 月份分组 2 -->
+    <div class="date-pill">📅 2026 年 7 月 <span class="sub">· 36 张</span></div>
+    <div class="jrow">
+      <div class="jitem" style="--r:1.78"><div class="ph p-b" data-emo="🌃"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">城市夜景.png</div></div></div>
+      <div class="jitem" style="--r:0.66"><div class="ph p-c" data-emo="🗼"><div class="tools"><button>⬇</button></div><div class="cap">高塔.jpg</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-d" data-emo="🍜"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">拉面.jpg</div></div></div>
+      <div class="jitem" style="--r:1.33"><div class="ph p-e" data-emo="🚆"><div class="tools"><button>⬇</button></div><div class="cap">列车.png</div></div></div>
+    </div>
+    <div class="jrow">
+      <div class="jitem" style="--r:1"><div class="ph video p-f" data-emo="🎬"><span class="tag">🎬 VIDEO</span><div class="tools"><button>⬇</button></div><div class="cap">海边 vlog.mp4</div></div></div>
+      <div class="jitem" style="--r:1.5"><div class="ph p-g" data-emo="🏖️"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">沙滩.png</div></div></div>
+      <div class="jitem" style="--r:0.8"><div class="ph gif p-h" data-emo="✨"><span class="tag">✨ GIF</span><div class="tools"><button>⬇</button></div><div class="cap">波浪.gif</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-a" data-emo="🦀"><div class="tools"><button>⬇</button></div><div class="cap">小螃蟹.jpg</div></div></div>
+      <div class="jitem" style="--r:1.2"><div class="ph p-b" data-emo="⛵"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">帆船.jpg</div></div></div>
+    </div>
+
+    <!-- 月份分组 3 -->
+    <div class="date-pill">📅 2026 年 6 月 <span class="sub">· 50 张</span></div>
+    <div class="jrow">
+      <div class="jitem" style="--r:1.33"><div class="ph p-c" data-emo="🏔️"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">雪山.png</div></div></div>
+      <div class="jitem" style="--r:1"><div class="ph p-d" data-emo="🐕"><div class="tools"><button>⬇</button></div><div class="cap">修勾.jpg</div></div></div>
+      <div class="jitem" style="--r:1.6"><div class="ph p-e" data-emo="🌈"><div class="tools"><button>⬇</button><button>🏷️</button></div><div class="cap">彩虹.jpg</div></div></div>
+      <div class="jitem" style="--r:0.75"><div class="ph p-f" data-emo="🌺"><div class="tools"><button>⬇</button></div><div class="cap">花朵.jpg</div></div></div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🐰 糖果图库 · Icon 库对比</title>
+<!-- 一个 CDN 组件吃下所有图标库：ep: / ph: / lucide: / solar: 前缀都来自 Iconify -->
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<style>
+  :root{
+    --bg:#FFF9E6; --bg2:#FFF0F5; --ink:#4A3B32; --accent:#FF6B9D;
+    --card:#ffffff; --line:#4A3B32;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Nunito','PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
+       background:linear-gradient(135deg,var(--bg),var(--bg2));color:var(--ink);min-height:100vh;padding:24px}
+  h1{margin:0 0 4px;font-weight:800}
+  .sub{color:#8a7568;margin:0 0 16px;line-height:1.6}
+  .toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .card{background:var(--card);border:3px solid var(--line);border-radius:18px;
+        box-shadow:6px 6px 0 var(--line);padding:18px 20px;margin:22px 0}
+  table{border-collapse:collapse;width:100%}
+  th,td{padding:12px 8px;text-align:center;border-bottom:2px dashed #ecdcc4;vertical-align:middle}
+  th{background:#fff6e0;font-size:14px;position:sticky;top:0;z-index:1}
+  td.use{font-weight:800;text-align:left;white-space:nowrap}
+  td.emoji{font-size:30px}
+  .cell{cursor:pointer;transition:background .12s,border-color .12s;border-radius:12px;border:2px solid transparent}
+  .cell:hover{background:#fff0f5;border-color:var(--accent)}
+  .cell .name{display:block;font-size:11px;color:#a08b7a;margin-top:6px;font-family:monospace;word-break:break-all}
+  iconify-icon{display:inline-block;transition:transform .12s;color:var(--ink)}
+  .cell:hover iconify-icon{transform:scale(1.18)}
+  .rec{font-size:12px;color:#b07a4a;max-width:130px;line-height:1.4}
+  .hint{font-size:13px;background:#fff6e0;border:2px solid var(--line);border-radius:12px;padding:8px 14px;display:inline-block;font-weight:700}
+  input[type=range]{accent-color:var(--accent);width:200px}
+  .section-title{font-weight:800;margin:0 0 6px;font-size:18px}
+  code{background:#fff0f5;padding:2px 6px;border-radius:6px;font-family:monospace;font-size:13px}
+  pre{background:#3a2f28;color:#ffd9ec;padding:14px;border-radius:12px;overflow:auto;font-size:13px;border:3px solid var(--line);box-shadow:4px 4px 0 var(--line);margin:8px 0}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 22px;border-radius:30px;box-shadow:4px 4px 0 var(--accent);opacity:0;transition:opacity .2s;pointer-events:none;font-weight:700;z-index:9}
+  .toast.show{opacity:1}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .tag.ep{background:#d4ecff;color:#1d6fb8}
+  .tag.ph{background:#ffe3b8;color:#b06a00}
+  .tag.lu{background:#e6e0ff;color:#5a3fb8}
+  .tag.so{background:#ffd6e8;color:#b8235a}
+</style>
+</head>
+<body>
+  <h1>🐰 糖果图库 · 图标库对比</h1>
+  <p class="sub">同一个含义在不同图标库里的样子。<b>点击任一图标复制它的名字</b> · 滑块调大小 · 图标联网按需加载，首次打开可能稍慢</p>
+
+  <div class="toolbar">
+    <span class="hint">🔎 图标大小</span>
+    <input type="range" id="size" min="20" max="80" value="42">
+    <span id="sizeVal" style="font-weight:800;width:56px">42px</span>
+  </div>
+
+  <div class="card">
+    <p class="section-title">① 功能图标（操作类）<span class="tag ep">Element Plus</span><span class="tag ph">Phosphor Duotone</span><span class="tag lu">Lucide</span></p>
+    <p class="sub">按钮里的操作图标。建议全部用 <code>@element-plus/icons-vue</code>（你项目已装、零依赖）；想要更可爱换 Phosphor Duotone。</p>
+    <table id="t1"></table>
+  </div>
+
+  <div class="card">
+    <p class="section-title">② 情绪 / 装饰图标<span class="tag ph">Phosphor Duotone</span><span class="tag lu">Lucide</span><span class="tag so">Solar Bold Duotone</span></p>
+    <p class="sub">Lucide 偏冷淡，Phosphor Duotone 柔和，Solar Bold Duotone 最糖果色。部分图标某库没有（显示 —）。</p>
+    <table id="t2"></table>
+  </div>
+
+  <div class="card">
+    <p class="section-title">③ 关于 🐰 兔子吉祥物</p>
+    <p class="sub">下面是 icon 库里的兔子——都偏简笔，撑不起"吉祥物"。建议：① 保留 emoji 🐰；② 用 OpenMoji 统一渲染；③ 定制手绘 SVG（最契合描边+硬阴影主题）。</p>
+    <table id="t3"></table>
+  </div>
+
+  <div class="card">
+    <p class="section-title">④ 怎么在项目里用</p>
+    <p class="sub">功能图标（已装，直接用）：</p>
+<pre>&lt;script setup&gt;
+import { Delete, EditPen, Download, UploadFilled } from '@element-plus/icons-vue'
+&lt;/script&gt;
+&lt;template&gt;
+  &lt;el-icon&gt;&lt;Delete/&gt;&lt;/el-icon&gt;
+&lt;/template&gt;</pre>
+    <p class="sub" style="margin-top:14px">情绪图标（彩色/duotone，引一个包吃下所有库，按需加载）：</p>
+<pre>pnpm --prefix client add @iconify/vue
+
+&lt;script setup&gt;
+import { Icon } from '@iconify/vue'
+&lt;/script&gt;
+&lt;template&gt;
+  &lt;Icon icon="ph:heart-duotone" /&gt;
+  &lt;Icon icon="solar:rocket-bold-duotone" /&gt;
+&lt;/template&gt;</pre>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+
+<script>
+// 数据：[用途, 当前emoji, 库1, 库2, 库3, 推荐]
+const functional = [
+  ['删除','🗑️','ep:delete','ph:trash-duotone','lucide:trash-2','EP'],
+  ['保存','💾','ep:document-checked','ph:floppy-disk-duotone','lucide:save','EP'],
+  ['下载','⬇️','ep:download','ph:download-simple-duotone','lucide:download','EP'],
+  ['上传','📤','ep:upload-filled','ph:upload-simple-duotone','lucide:upload','EP'],
+  ['重命名','✏️','ep:edit-pen','ph:pencil-simple-duotone','lucide:pencil','EP'],
+  ['新建','➕','ep:plus','ph:plus-duotone','lucide:plus','EP'],
+  ['预览','🔍','ep:zoom-in','ph:magnifying-glass-plus-duotone','lucide:search','EP'],
+  ['刷新','🔄','ep:refresh','ph:arrow-clockwise-duotone','lucide:refresh-cw','EP'],
+  ['关闭','✖','ep:close','ph:x-duotone','lucide:x','EP'],
+  ['退出','🚪','ep:switch-button','ph:sign-out-duotone','lucide:log-out','EP'],
+  ['用户名','👤','ep:user','ph:user-duotone','lucide:user','EP'],
+  ['密码','🔒','ep:lock','ph:lock-duotone','lucide:lock','EP'],
+  ['提示','💡','ep:info-filled','ph:info-duotone','lucide:info','EP 无灯泡'],
+  ['日期','📅','ep:calendar','ph:calendar-duotone','lucide:calendar','EP'],
+  ['文件大小','📦','ep:files','ph:package-duotone','lucide:package','EP'],
+  ['列表','📋','ep:list','ph:list-duotone','lucide:list','EP'],
+  ['警告','⚠️','ep:warning-filled','ph:warning-duotone','lucide:triangle-alert','EP'],
+  ['成功','✅','ep:circle-check-filled','ph:check-circle-duotone','lucide:circle-check','EP'],
+  ['失败','❌','ep:circle-close','ph:x-circle-duotone','lucide:circle-x','EP'],
+  ['分类标签','🏷️','ep:price-tag','ph:tag-duotone','lucide:tag','EP'],
+  ['图库','🖼️','ep:picture-filled','ph:image-duotone','lucide:image','EP'],
+];
+
+const mood = [
+  ['心','💖','ph:heart-duotone','lucide:heart','solar:heart-bold-duotone','Solar 最糖果'],
+  ['闪光','✨','ph:sparkle-duotone','lucide:sparkles','','Phosphor'],
+  ['星','⭐','ph:star-duotone','lucide:star','solar:star-bold-duotone','Solar'],
+  ['礼花','🎉','','lucide:party-popper','','仅 Lucide'],
+  ['火箭','🚀','ph:rocket-duotone','lucide:rocket','solar:rocket-bold-duotone','Solar / Phosphor'],
+  ['云','☁️','ph:cloud-duotone','lucide:cloud','solar:cloud-bold-duotone','Phosphor'],
+  ['彩虹','🌈','ph:rainbow-duotone','lucide:rainbow','','Phosphor'],
+  ['花','🌸','ph:flower-duotone','lucide:flower-2','','Phosphor'],
+];
+
+const bunny = [
+  ['兔子 🐰','🐰','ph:rabbit-duotone','lucide:rabbit'],
+];
+
+function cell(name){
+  if(!name) return '<td class="cell" style="opacity:.25;cursor:default">—</td>';
+  return `<td class="cell" data-name="${name}" title="点击复制 ${name}">
+    <iconify-icon icon="${name}" width="42"></iconify-icon>
+    <span class="name">${name}</span>
+  </td>`;
+}
+
+function build(rows, heads, cols){
+  let h = '<thead><tr>' + heads.map(x=>`<th>${x}</th>`).join('') + '</tr></thead><tbody>';
+  for(const r of rows){
+    h += `<tr><td class="use">${r[0]}</td><td class="emoji">${r[1]}</td>`;
+    for(let i=0;i<cols;i++) h += cell(r[2+i]);
+    if(r[2+cols] !== undefined) h += `<td class="rec">${r[2+cols]}</td>`;
+    h += '</tr>';
+  }
+  return h + '</tbody>';
+}
+
+document.getElementById('t1').innerHTML = build(functional, ['用途','当前 emoji','Element Plus','Phosphor Duotone','Lucide','推荐'], 3);
+document.getElementById('t2').innerHTML = build(mood, ['用途','当前 emoji','Phosphor Duotone','Lucide','Solar Bold Duotone','推荐'], 3);
+document.getElementById('t3').innerHTML = build(bunny, ['用途','当前 emoji','Phosphor','Lucide'], 2);
+
+// 大小滑块
+const sizeInput = document.getElementById('size');
+const sizeVal = document.getElementById('sizeVal');
+sizeInput.addEventListener('input', e=>{
+  const v = e.target.value;
+  document.querySelectorAll('iconify-icon').forEach(el=>el.setAttribute('width', v));
+  sizeVal.textContent = v + 'px';
+});
+
+// 复制（兼容 file:// 双击打开）
+function copy(text){
+  if(navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((res,rej)=>{
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); res(); } catch(e){ rej(e); }
+    document.body.removeChild(ta);
+  });
+}
+const toast = document.getElementById('toast');
+document.addEventListener('click', e=>{
+  const c = e.target.closest('.cell');
+  if(!c || !c.dataset.name) return;
+  copy(c.dataset.name).then(()=>{
+    toast.textContent = '已复制 ' + c.dataset.name;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1200);
+  });
+});
+</script>
+</body>
+</html>

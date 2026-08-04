@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V3 · 沉浸式时刻分组 — 糖果图库原型</title>
+<link rel="stylesheet" href="_cartoon.css" />
+<style>
+  /* ===== V3 版式：时刻分组 + 大方图 + 多选 ===== */
+  .v3-main { max-width: 1280px; margin: 0 auto; padding: 18px 20px 60px; }
+
+  /* 多选操作条（mockup 静态展示「已进入多选」态） */
+  .selbar {
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin-bottom: 18px;
+  }
+  .selbar .count {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 16px; font-size:14px; font-weight:900;
+    background: linear-gradient(180deg,#D4FFC2,#CAFFBF);
+    border: var(--border-sm); border-radius:999px; box-shadow: var(--shadow-sm);
+  }
+  .selbar .hint { font-size:12px; font-weight:700; color:var(--brown); }
+
+  .moment { margin-bottom: 34px; }
+  .v3-grid {
+    display:grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+  }
+  @media (max-width:1024px){ .v3-grid{grid-template-columns:repeat(4,1fr);} }
+  @media (max-width:768px){ .v3-grid{grid-template-columns:repeat(3,1fr); gap:12px;} }
+  @media (max-width:480px){ .v3-grid{grid-template-columns:repeat(2,1fr);} }
+
+  .gcard {
+    position:relative; aspect-ratio:1/1;
+    border: var(--border-sm); border-radius:14px;
+    box-shadow: var(--shadow-sm); overflow:hidden; cursor:pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .gcard:hover { transform: translateY(-3px); box-shadow: 5px 5px 0 var(--brown); }
+  .gcard .ph { width:100%; height:100%; }
+  .gcard .ph::before { font-size: 38px; }
+
+  /* 左上勾选圈 */
+  .gcard .check {
+    position:absolute; top:9px; left:9px; z-index:4;
+    width:28px; height:28px; border-radius:50%;
+    border:2.5px solid #fff; background: rgba(62,39,35,.32);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:15px; font-weight:900;
+    opacity:0; transform: scale(.85); transition: all .15s;
+  }
+  .gcard:hover .check { opacity:1; transform:scale(1); }
+  .gcard.sel .check {
+    opacity:1; transform:scale(1);
+    background: var(--mint); border-color: var(--brown); color: var(--brown-deep);
+  }
+  .gcard.sel { box-shadow: 0 0 0 3px var(--mint), 4px 4px 0 var(--brown); }
+
+  /* 右上下载 */
+  .gcard .dl {
+    position:absolute; top:9px; right:9px; z-index:4;
+    width:30px; height:30px; font-size:13px; cursor:pointer;
+    background:#fff; border:2.5px solid var(--brown); border-radius:50%;
+    box-shadow: var(--shadow-sm); display:flex; align-items:center; justify-content:center;
+    opacity:0; transform: translateY(-4px); transition: all .15s;
+  }
+  .gcard:hover .dl { opacity:1; transform:none; }
+  .gcard .dl:hover { background: var(--yellow); transform: scale(1.12); }
+
+  /* 底部名字 */
+  .gcard .cap {
+    position:absolute; left:0; right:0; bottom:0; z-index:3;
+    padding: 16px 10px 7px; font-size:12px; font-weight:900; color:#fff;
+    background: linear-gradient(transparent, rgba(62,39,35,.82));
+    opacity:0; transform: translateY(6px); transition: all .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .gcard:hover .cap { opacity:1; transform:none; }
+</style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 返回对比</a>
+  <span class="proto-tag">V3 · Apple Photos 风</span>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo"><span class="emo">🐰</span><b>糖果图库</b></div>
+      <div class="search-box"><span class="ico">🔍</span><input placeholder="搜索某一天的照片…" /></div>
+      <button class="ctn-btn success">✔ 选择</button>
+      <div class="user-box"><span class="ava">🐰</span>小兔子<a class="ctn-btn" style="padding:4px 12px;font-size:12px" href="#">退出</a></div>
+    </div>
+    <div class="chip-row">
+      <button class="chip on">⭐ 全部 <i>128</i></button>
+      <button class="chip"><span class="dot" style="background:#FFADAD"></span>旅行 <i>32</i></button>
+      <button class="chip"><span class="dot" style="background:#A0C4FF"></span>美食 <i>24</i></button>
+      <button class="chip"><span class="dot" style="background:#CAFFBF"></span>宠物 <i>18</i></button>
+      <button class="chip"><span class="dot" style="background:#BDB2FF"></span>风景 <i>29</i></button>
+    </div>
+  </header>
+
+  <main class="v3-main">
+    <!-- 多选操作条 -->
+    <div class="selbar">
+      <span class="count">✔ 已选 3 张</span>
+      <a class="ctn-btn primary" style="padding:7px 16px;font-size:13px" href="#">⬇ 下载</a>
+      <a class="ctn-btn" style="padding:7px 16px;font-size:13px" href="#">🏷️ 移动分类</a>
+      <a class="ctn-btn danger" style="padding:7px 16px;font-size:13px" href="#">🗑 删除</a>
+      <span class="hint">· 点卡片左上圈勾选，可批量操作</span>
+    </div>
+
+    <!-- 时刻：今天 -->
+    <div class="moment">
+      <div class="group-title"><h3>📅 今天</h3><span class="sub">· 上海 · 6 张</span></div>
+      <div class="v3-grid">
+        <div class="gcard sel"><div class="ph p-a" data-emo="🍰"><span class="check">✓</span><span class="dl">⬇</span><div class="cap">下午茶.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-b" data-emo="☕"><span class="check"></span><span class="dl">⬇</span><div class="cap">咖啡.jpg</div></div></div>
+        <div class="gcard sel"><div class="ph p-c" data-emo="🌻"><span class="check">✓</span><span class="dl">⬇</span><div class="cap">向日葵.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-d" data-emo="🐰"><span class="check"></span><span class="dl">⬇</span><div class="cap">兔兔.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-e" data-emo="🎈"><span class="check"></span><span class="dl">⬇</span><div class="cap">气球.jpg</div></div></div>
+      </div>
+    </div>
+
+    <!-- 时刻：昨天 -->
+    <div class="moment">
+      <div class="group-title"><h3>📅 昨天</h3><span class="sub">· 杭州 · 5 张</span></div>
+      <div class="v3-grid">
+        <div class="gcard"><div class="ph p-f" data-emo="🏞️"><span class="check"></span><span class="dl">⬇</span><div class="cap">西湖.png</div></div></div>
+        <div class="gcard sel"><div class="ph video p-g" data-emo="🎬"><span class="tag">🎬 VIDEO</span><span class="check">✓</span><span class="dl">⬇</span><div class="cap">游船.mp4</div></div></div>
+        <div class="gcard"><div class="ph p-h" data-emo="🍜"><span class="check"></span><span class="dl">⬇</span><div class="cap">杭帮菜.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-a" data-emo="🌿"><span class="check"></span><span class="dl">⬇</span><div class="cap">茶园.jpg</div></div></div>
+        <div class="gcard"><div class="ph gif p-b" data-emo="✨"><span class="tag">✨ GIF</span><span class="check"></span><span class="dl">⬇</span><div class="cap">落叶.gif</div></div></div>
+      </div>
+    </div>
+
+    <!-- 时刻：8月2日 -->
+    <div class="moment">
+      <div class="group-title"><h3>📅 8 月 2 日</h3><span class="sub">· 苏州 · 5 张</span></div>
+      <div class="v3-grid">
+        <div class="gcard"><div class="ph p-c" data-emo="🏯"><span class="check"></span><span class="dl">⬇</span><div class="cap">拙政园.png</div></div></div>
+        <div class="gcard"><div class="ph p-d" data-emo="🐢"><span class="check"></span><span class="dl">⬇</span><div class="cap">小乌龟.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-e" data-emo="🚣"><span class="check"></span><span class="dl">⬇</span><div class="cap">划船.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-f" data-emo="🌙"><span class="check"></span><span class="dl">⬇</span><div class="cap">夜色.jpg</div></div></div>
+        <div class="gcard"><div class="ph p-g" data-emo="🎐"><span class="check"></span><span class="dl">⬇</span><div class="cap">风铃.jpg</div></div></div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

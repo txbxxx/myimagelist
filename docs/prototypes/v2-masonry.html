@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V2 · 瀑布流发现 — 糖果图库原型</title>
+<link rel="stylesheet" href="_cartoon.css" />
+<style>
+  /* ===== V2 版式：Masonry 瀑布流 ===== */
+  .v2-main { max-width: 1280px; margin: 0 auto; padding: 18px 20px 60px; }
+  .v2-head { display:flex; align-items:baseline; gap:12px; margin-bottom:16px; }
+  .v2-head h2 { margin:0; font-size:24px; font-weight:900; }
+  .v2-head .sub { font-size:13px; font-weight:800; color:var(--brown); }
+
+  .masonry { column-count: 4; column-gap: 16px; }
+  @media (max-width:1024px){ .masonry{column-count:3;} }
+  @media (max-width:768px){ .masonry{column-count:2;} }
+  @media (max-width:480px){ .masonry{column-count:1;} }
+
+  .mcard {
+    position: relative; break-inside: avoid; margin-bottom: 16px;
+    border: var(--border-sm); border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm); background:#fff; overflow:hidden;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .mcard:hover {
+    transform: translate(-3px,-3px) rotate(-.4deg);
+    box-shadow: 6px 6px 0 var(--brown);
+  }
+  .mcard .ph { width: 100%; }
+  .ar-tall { aspect-ratio: 3/4; }
+  .ar-sq   { aspect-ratio: 1/1; }
+  .ar-wide { aspect-ratio: 4/3; }
+  .ar-port { aspect-ratio: 2/3; }
+  .ar-pano { aspect-ratio: 16/9; }
+  .ar-xtall{ aspect-ratio: 9/16; }
+
+  /* hover 顶部操作（下载 / 收藏 / 分类） */
+  .ov-top {
+    position:absolute; top:8px; right:8px; z-index:3;
+    display:flex; gap:5px; opacity:0; transform:translateY(-5px);
+    transition: opacity .15s, transform .15s;
+  }
+  .mcard:hover .ov-top { opacity:1; transform:none; }
+  .ov-top button {
+    width:34px; height:34px; font-size:14px; cursor:pointer;
+    background:#fff; border:2.5px solid var(--brown); border-radius:50%;
+    box-shadow: var(--shadow-sm); display:flex; align-items:center; justify-content:center;
+    transition: all .12s;
+  }
+  .ov-top button:hover { background:var(--yellow); transform: scale(1.12); }
+  .ov-top button.fav:hover { background: var(--pink); }
+
+  /* hover 底部信息 */
+  .ov-bottom {
+    position:absolute; left:0; right:0; bottom:0; z-index:3;
+    padding: 22px 12px 9px; color:#fff;
+    background: linear-gradient(transparent, rgba(62,39,35,.85));
+    opacity:0; transform:translateY(8px); transition: all .15s;
+  }
+  .mcard:hover .ov-bottom { opacity:1; transform:none; }
+  .ov-bottom .name { font-size:13px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ov-bottom .meta { font-size:11px; font-weight:700; opacity:.85; margin-top:2px; display:flex; gap:6px; align-items:center; }
+</style>
+</head>
+<body>
+  <a class="back-link" href="index.html">← 返回对比</a>
+  <span class="proto-tag">V2 · Pinterest 风</span>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo"><span class="emo">🐰</span><b>糖果图库</b></div>
+      <div class="search-box"><span class="ico">🔍</span><input placeholder="发现更多好图…" /></div>
+      <div class="view-switch">
+        <button title="密集网格">▦</button>
+        <button class="on" title="瀑布流">▤</button>
+        <button title="时刻">▢</button>
+      </div>
+      <div class="user-box"><span class="ava">🐰</span>小兔子<a class="ctn-btn" style="padding:4px 12px;font-size:12px" href="#">退出</a></div>
+    </div>
+    <div class="chip-row">
+      <button class="chip on">⭐ 全部 <i>128</i></button>
+      <button class="chip"><span class="dot" style="background:#FFADAD"></span>旅行 <i>32</i></button>
+      <button class="chip"><span class="dot" style="background:#A0C4FF"></span>美食 <i>24</i></button>
+      <button class="chip"><span class="dot" style="background:#CAFFBF"></span>宠物 <i>18</i></button>
+      <button class="chip"><span class="dot" style="background:#BDB2FF"></span>风景 <i>29</i></button>
+    </div>
+  </header>
+
+  <main class="v2-main">
+    <div class="v2-head"><h2>🌈 发现</h2><span class="sub">· 按你的喜好瀑布流排列，竖图大、横图小</span></div>
+
+    <div class="masonry">
+      <div class="mcard">
+        <div class="ph p-a ar-port" data-emo="🗼">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button><button>🏷️</button></div>
+          <div class="ov-bottom"><div class="name">东京塔.jpg</div><div class="meta">📷 2.1MB · 07-22</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-b ar-wide" data-emo="🌃">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">城市夜景.png</div><div class="meta">📷 4.4MB · 07-18</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-c ar-tall" data-emo="🌸">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button><button>🏷️</button></div>
+          <div class="ov-bottom"><div class="name">樱花季.jpg</div><div class="meta">📷 1.8MB · 04-09</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-d ar-sq" data-emo="🍰">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">下午茶.jpg</div><div class="meta">📷 920KB · 08-01</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-e ar-xtall" data-emo="🏞️">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button><button>🏷️</button></div>
+          <div class="ov-bottom"><div class="name">大瀑布.png</div><div class="meta">📷 3.0MB · 06-15</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-f ar-pano" data-emo="🌅">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">海上日出.jpg</div><div class="meta">📷 5.2MB · 07-30</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph gif p-h ar-port" data-emo="✨"><span class="tag">✨ GIF</span>
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">浪花.gif</div><div class="meta">🌀 动图 · 2.3MB</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-g ar-tall" data-emo="🌳">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button><button>🏷️</button></div>
+          <div class="ov-bottom"><div class="name">森林.jpg</div><div class="meta">📷 2.7MB · 06-02</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph video p-a ar-sq" data-emo="🎬"><span class="tag">🎬 VIDEO</span>
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">海边 vlog.mp4</div><div class="meta">🎬 18.4MB · 00:42</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-c ar-wide" data-emo="🍜">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">深夜拉面.jpg</div><div class="meta">📷 1.5MB · 07-19</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-b ar-port" data-emo="🏯">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button><button>🏷️</button></div>
+          <div class="ov-bottom"><div class="name">古城墙.png</div><div class="meta">📷 3.3MB · 05-11</div></div>
+        </div>
+      </div>
+      <div class="mcard">
+        <div class="ph p-d ar-sq" data-emo="🐰">
+          <div class="ov-top"><button class="fav">❤</button><button>⬇</button></div>
+          <div class="ov-bottom"><div class="name">我家兔兔.jpg</div><div class="meta">📷 1.1MB · 08-03</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

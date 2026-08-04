@@ -1,0 +1,317 @@
+/* =============================================
+   卡通主题全局样式 - 覆盖 Element Plus
+   ============================================= */
+
+:root {
+  --cartoon-bg: #FFF9E6;
+  --cartoon-bg-soft: #FFF0F5;
+  --cartoon-blue: #A0C4FF;
+  --cartoon-mint: #CAFFBF;
+  --cartoon-pink: #FFADAD;
+  --cartoon-yellow: #FDFFB6;
+  --cartoon-purple: #BDB2FF;
+  --cartoon-peach: #FFD6A5;
+  --cartoon-brown: #4A3B32;
+  --cartoon-brown-deep: #3E2723;
+  --cartoon-shadow: 4px 4px 0px #4A3B32;
+  --cartoon-shadow-hover: 6px 6px 0px #4A3B32;
+  --cartoon-radius: 18px;
+  --cartoon-radius-sm: 12px;
+  --cartoon-border: 3px solid #4A3B32;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--cartoon-brown-deep);
+}
+
+body {
+  background-color: var(--cartoon-bg);
+  background-image:
+    radial-gradient(circle at 20px 30px, rgba(255, 214, 165, 0.35) 8px, transparent 9px),
+    radial-gradient(circle at 80px 120px, rgba(160, 196, 255, 0.30) 10px, transparent 11px),
+    radial-gradient(circle at 200px 60px, rgba(202, 255, 191, 0.30) 6px, transparent 7px),
+    radial-gradient(circle at 300px 200px, rgba(255, 173, 173, 0.28) 9px, transparent 10px);
+  background-size: 400px 300px;
+  background-attachment: fixed;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--cartoon-bg-soft); border-radius: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--cartoon-peach);
+  border: 2px solid var(--cartoon-brown);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--cartoon-pink); }
+
+/* ========== 通用卡通按钮 ========== */
+.cartoon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--cartoon-brown-deep);
+  background: linear-gradient(180deg, #FFF6BD 0%, #FDFFB6 100%);
+  border: var(--cartoon-border);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--cartoon-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  user-select: none;
+}
+.cartoon-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--cartoon-shadow-hover);
+}
+.cartoon-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #4A3B32;
+}
+.cartoon-btn.primary {
+  background: linear-gradient(180deg, #B5E2FF 0%, #A0C4FF 100%);
+}
+.cartoon-btn.success {
+  background: linear-gradient(180deg, #D4FFC2 0%, #CAFFBF 100%);
+}
+.cartoon-btn.danger {
+  background: linear-gradient(180deg, #FFC9C9 0%, #FFADAD 100%);
+}
+
+/* ========== Element Plus 按钮重写 ========== */
+.el-button {
+  border-radius: 999px !important;
+  border: var(--cartoon-border) !important;
+  font-weight: 800 !important;
+  box-shadow: var(--cartoon-shadow) !important;
+  transition: transform 0.15s, box-shadow 0.15s !important;
+  padding: 8px 20px !important;
+}
+.el-button:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: var(--cartoon-shadow-hover) !important;
+}
+.el-button:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0 #4A3B32 !important;
+}
+.el-button--primary {
+  background: linear-gradient(180deg, #B5E2FF, #A0C4FF) !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+.el-button--success {
+  background: linear-gradient(180deg, #D4FFC2, #CAFFBF) !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+.el-button--danger {
+  background: linear-gradient(180deg, #FFC9C9, #FFADAD) !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+.el-button--warning {
+  background: linear-gradient(180deg, #FFE9A0, #FDFFB6) !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+
+/* ========== 卡片 ========== */
+.el-card {
+  border: var(--cartoon-border) !important;
+  border-radius: var(--cartoon-radius) !important;
+  box-shadow: var(--cartoon-shadow) !important;
+  background: #fff !important;
+  overflow: hidden;
+}
+.el-card__header {
+  background: var(--cartoon-bg-soft) !important;
+  border-bottom: var(--cartoon-border) !important;
+  padding: 14px 20px !important;
+  font-weight: 800 !important;
+}
+
+/* ========== 对话框 ========== */
+.el-dialog {
+  border: var(--cartoon-border) !important;
+  border-radius: var(--cartoon-radius) !important;
+  box-shadow: 8px 8px 0 var(--cartoon-brown) !important;
+  overflow: hidden;
+}
+.el-dialog__header {
+  background: linear-gradient(180deg, #FFF0F5, #FFD6E8) !important;
+  border-bottom: var(--cartoon-border) !important;
+  padding: 16px 20px !important;
+  margin: 0 !important;
+}
+.el-dialog__title {
+  font-weight: 900 !important;
+  font-size: 20px !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+.el-dialog__body { padding: 20px !important; }
+.el-dialog__footer { padding: 14px 20px !important; border-top: 2px dashed #e0d4c0; }
+.el-dialog__headerbtn .el-dialog__close {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+
+/* ========== 上传组件 ========== */
+.el-upload-dragger {
+  border: 3px dashed var(--cartoon-brown) !important;
+  border-radius: var(--cartoon-radius) !important;
+  background: linear-gradient(180deg, #FFFBE6 0%, #FFF0F5 100%) !important;
+  box-shadow: var(--cartoon-shadow) !important;
+  padding: 40px 20px !important;
+  transition: all 0.2s !important;
+}
+.el-upload-dragger:hover {
+  background: linear-gradient(180deg, #FFF6BD 0%, #FFE0EC 100%) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: var(--cartoon-shadow-hover) !important;
+}
+.el-upload-dragger .el-icon--upload {
+  font-size: 64px !important;
+  color: var(--cartoon-brown) !important;
+  margin-bottom: 12px;
+}
+
+/* ========== 标签 ========== */
+.el-tag {
+  border: 2.5px solid var(--cartoon-brown) !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  padding: 4px 14px !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+  background-color: var(--cartoon-peach) !important;
+  color: var(--cartoon-brown-deep) !important;
+  box-shadow: 2px 2px 0 var(--cartoon-brown) !important;
+}
+.el-tag .el-tag__close {
+  color: var(--cartoon-brown-deep) !important;
+  background-color: rgba(255,255,255,0.5) !important;
+  border-radius: 50% !important;
+}
+
+/* ========== 输入框 / 选择器 ========== */
+.el-input__wrapper, .el-textarea__inner, .el-select__wrapper {
+  background-color: #FFFBE6 !important;
+  border-radius: var(--cartoon-radius-sm) !important;
+  box-shadow: 0 0 0 3px var(--cartoon-brown) inset !important;
+  padding: 4px 12px !important;
+  transition: all 0.2s !important;
+}
+.el-input__wrapper:hover, .el-select__wrapper:hover {
+  box-shadow: 0 0 0 3px var(--cartoon-brown) inset, 2px 2px 0 var(--cartoon-brown) !important;
+}
+.el-input__wrapper.is-focus, .el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 3px var(--cartoon-brown) inset, 4px 4px 0 var(--cartoon-brown) !important;
+}
+.el-input__inner, .el-textarea__inner {
+  color: var(--cartoon-brown-deep) !important;
+  font-weight: 600 !important;
+}
+
+/* ========== 进度条 ========== */
+.el-progress-bar__outer {
+  background-color: #FFFBE6 !important;
+  border: 2.5px solid var(--cartoon-brown) !important;
+  border-radius: 999px !important;
+  height: 18px !important;
+  overflow: hidden;
+}
+.el-progress-bar__inner {
+  background: linear-gradient(90deg, #A0C4FF, #CAFFBF, #FDFFB6, #FFADAD) !important;
+  border-radius: 999px !important;
+}
+.el-progress__text {
+  font-weight: 800 !important;
+  color: var(--cartoon-brown-deep) !important;
+}
+
+/* ========== 消息提示 ========== */
+.el-message {
+  border: var(--cartoon-border) !important;
+  border-radius: var(--cartoon-radius-sm) !important;
+  box-shadow: var(--cartoon-shadow) !important;
+  background: #fff !important;
+  color: var(--cartoon-brown-deep) !important;
+  font-weight: 700 !important;
+}
+.el-message--success { background: #E8FFD8 !important; }
+.el-message--error   { background: #FFE0E0 !important; }
+.el-message--warning { background: #FFF6BD !important; }
+
+/* ========== 确认弹窗 ========== */
+.el-message-box {
+  border: var(--cartoon-border) !important;
+  border-radius: var(--cartoon-radius) !important;
+  box-shadow: 8px 8px 0 var(--cartoon-brown) !important;
+  background: #fff !important;
+}
+.el-message-box__title { font-weight: 900 !important; color: var(--cartoon-brown-deep) !important; }
+
+/* ========== 空状态 / 加载动画 ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+.empty-state .emoji { font-size: 80px; animation: float 3s ease-in-out infinite; }
+.empty-state p { color: var(--cartoon-brown); font-weight: 700; font-size: 18px; margin-top: 16px; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes spin-bounce {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.loading-emoji {
+  font-size: 48px;
+  display: inline-block;
+  animation: spin-bounce 1.4s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  :root { --cartoon-radius: 14px; --cartoon-shadow: 3px 3px 0 #4A3B32; }
+  .el-button { padding: 6px 14px !important; font-size: 14px !important; }
+}
+
+/* 悬浮操作按钮（图片卡片右下角用） */
+.float-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid var(--cartoon-brown);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--cartoon-brown);
+  transition: all 0.15s;
+  font-size: 16px;
+  color: var(--cartoon-brown-deep);
+}
+.float-btn:hover {
+  transform: translate(-1px, -1px) rotate(-6deg);
+  box-shadow: 3px 3px 0 var(--cartoon-brown);
+  background: var(--cartoon-yellow);
+}
+.float-btn.danger { background: var(--cartoon-pink); }
+.float-btn.success { background: var(--cartoon-mint); }

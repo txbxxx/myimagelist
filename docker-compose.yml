@@ -1,0 +1,61 @@
+# 糖果图库 · 一键起整套
+# 用法：
+#   1. 复制 .env.example 为 .env，按需改 JWT_SECRET / STORAGE_TYPE / COS_*
+#   2. pnpm install  (根目录，装 concurrently)
+#   3. docker compose up -d --build
+#   4. 浏览器开 http://localhost
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: candy-gallery-server:latest
+    container_name: candy-server
+    restart: unless-stopped
+    # 读根 .env（也可以在 environment 里直接覆盖）
+    env_file:
+      - .env
+    environment:
+      # 没在 .env 里的默认值；docker compose 启动时如有 .env 会覆盖
+      NODE_ENV: production
+      TZ: Asia/Shanghai
+    ports:
+      - "3000:3000"     # 方便本地直接调试后端；生产可去掉
+    volumes:
+      # 持久化数据库 + 上传文件
+      - candy-db:/app/db.sqlite
+      - candy-uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - candy-net
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: candy-gallery-client:latest
+    container_name: candy-client
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    networks:
+      - candy-net
+
+networks:
+  candy-net:
+    driver: bridge
+
+volumes:
+  candy-db:
+    # SQLite 单文件，用 named volume 就够了；要备份直接拷 /var/lib/docker/volumes/candy-db
+  candy-uploads:
+    # 本地存储模式的文件落点；切到 COS 后这个卷可以删

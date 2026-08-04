@@ -1,0 +1,201 @@
+/* =============================================
+   糖果图库 · 优化原型共享样式
+   复刻项目 cartoon.css 的 token + mockup 通用原子类
+   三版原型 (v1/v2/v3) 共用，版式专用样式各自内联
+   ============================================= */
+
+:root {
+  --bg: #FFF9E6;
+  --bg-soft: #FFF0F5;
+  --blue: #A0C4FF;
+  --mint: #CAFFBF;
+  --pink: #FFADAD;
+  --yellow: #FDFFB6;
+  --purple: #BDB2FF;
+  --peach: #FFD6A5;
+  --brown: #4A3B32;
+  --brown-deep: #3E2723;
+  --shadow: 4px 4px 0px #4A3B32;
+  --shadow-hover: 6px 6px 0px #4A3B32;
+  --shadow-sm: 2px 2px 0 #4A3B32;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --border: 3px solid #4A3B32;
+  --border-sm: 2.5px solid #4A3B32;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; min-height: 100vh;
+  font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--brown-deep);
+}
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 20px 30px,  rgba(255,214,165,.35) 8px, transparent 9px),
+    radial-gradient(circle at 80px 120px, rgba(160,196,255,.30) 10px, transparent 11px),
+    radial-gradient(circle at 200px 60px, rgba(202,255,191,.30) 6px, transparent 7px),
+    radial-gradient(circle at 300px 200px, rgba(255,173,173,.28) 9px, transparent 10px);
+  background-size: 400px 300px;
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--bg-soft); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--peach); border: 2px solid var(--brown); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+
+/* ========== 按钮 ========== */
+.ctn-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; font-size: 14px; font-weight: 800;
+  color: var(--brown-deep);
+  background: linear-gradient(180deg, #FFF6BD, #FDFFB6);
+  border: var(--border); border-radius: 999px; cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .15s, box-shadow .15s; text-decoration: none; user-select: none;
+}
+.ctn-btn:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow-hover); }
+.ctn-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--brown); }
+.ctn-btn.primary { background: linear-gradient(180deg,#B5E2FF,#A0C4FF); }
+.ctn-btn.success { background: linear-gradient(180deg,#D4FFC2,#CAFFBF); }
+.ctn-btn.danger  { background: linear-gradient(180deg,#FFC9C9,#FFADAD); }
+
+/* ========== 顶栏 ========== */
+.topbar {
+  background: linear-gradient(180deg, #FFFBE6, #FFF0F5);
+  border-bottom: var(--border);
+  box-shadow: 0 4px 0 var(--brown);
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-inner {
+  max-width: 1280px; margin: 0 auto; padding: 12px 20px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.logo { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.logo .emo { font-size: 30px; display: inline-block; transition: transform .3s; }
+.logo:hover .emo { transform: rotate(-12deg) scale(1.1); }
+.logo b { font-size: 22px; font-weight: 900; color: var(--brown-deep); letter-spacing: 1px; }
+
+.search-box {
+  flex: 1; min-width: 200px; max-width: 420px;
+  display: flex; align-items: center; gap: 8px;
+  background: #FFFBE6; border: var(--border-sm); border-radius: 999px;
+  box-shadow: var(--shadow-sm); padding: 7px 16px;
+  transition: box-shadow .2s;
+}
+.search-box:focus-within { box-shadow: var(--shadow); transform: translate(-1px,-1px); }
+.search-box .ico { font-size: 16px; opacity: .7; }
+.search-box input {
+  border: none; outline: none; background: transparent;
+  font-size: 14px; font-weight: 700; color: var(--brown-deep); flex: 1; font-family: inherit;
+}
+.search-box input::placeholder { color: var(--brown); opacity: .6; }
+
+.view-switch { display: flex; gap: 6px; }
+.view-switch button {
+  width: 38px; height: 38px; font-size: 16px; cursor: pointer;
+  background: #fff; border: var(--border-sm); border-radius: 12px;
+  box-shadow: var(--shadow-sm); transition: all .15s; color: var(--brown-deep);
+}
+.view-switch button:hover { background: var(--yellow); transform: translate(-1px,-1px); }
+.view-switch button.on { background: linear-gradient(180deg,#B5E2FF,#A0C4FF); }
+
+.user-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 8px 4px 12px; background: #fff;
+  border: var(--border-sm); border-radius: 999px; box-shadow: var(--shadow-sm);
+  font-weight: 800; font-size: 13px;
+}
+.user-box .ava {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--brown);
+  background: var(--pink); display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+
+/* ========== 分类 chip 行 ========== */
+.chip-row {
+  max-width: 1280px; margin: 0 auto; padding: 10px 20px 14px;
+  display: flex; gap: 8px; overflow-x: auto; align-items: center;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; font-size: 13px; font-weight: 800;
+  color: var(--brown-deep); background: #fff;
+  border: var(--border-sm); border-radius: 999px; cursor: pointer;
+  box-shadow: var(--shadow-sm); transition: all .15s; white-space: nowrap;
+}
+.chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--brown); }
+.chip.on { box-shadow: 3px 3px 0 var(--brown); font-weight: 900; }
+.chip i {
+  font-style: normal; background: rgba(255,255,255,.65);
+  border-radius: 999px; padding: 0 7px; font-size: 11px; font-weight: 900;
+}
+.chip .dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--brown); }
+
+/* ========== 分组标题 ========== */
+.date-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; margin: 22px 0 12px;
+  background: linear-gradient(180deg,#FFF6BD,#FDFFB6);
+  border: var(--border); border-radius: 999px; box-shadow: var(--shadow-sm);
+  font-weight: 900; font-size: 15px;
+}
+.date-pill .sub { font-size: 12px; font-weight: 800; color: var(--brown); opacity: .8; }
+
+.group-title {
+  display: flex; align-items: baseline; gap: 10px;
+  margin: 26px 0 14px;
+}
+.group-title h3 { margin: 0; font-size: 20px; font-weight: 900; color: var(--brown-deep); }
+.group-title .sub { font-size: 13px; font-weight: 800; color: var(--brown); }
+
+/* ========== 占位「照片」========== */
+.ph {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.ph::before {
+  content: attr(data-emo); font-size: 30px; opacity: .85;
+  filter: drop-shadow(1px 1px 0 rgba(74,59,50,.35));
+}
+.ph .tag {
+  position: absolute; right: 6px; bottom: 6px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; font-size: 10px; font-weight: 900; color: #fff;
+  border: 2px solid var(--brown); border-radius: 999px; box-shadow: var(--shadow-sm);
+}
+.ph.video .tag { background: linear-gradient(180deg,#FF7A7A,#E54444); }
+.ph.gif .tag   { background: linear-gradient(180deg,#B19BFF,#E26AC8); }
+
+/* 渐变变体（模拟不同照片） */
+.p-a { background: linear-gradient(135deg,#FFD6A5,#FFADAD); }
+.p-b { background: linear-gradient(135deg,#A0C4FF,#BDB2FF); }
+.p-c { background: linear-gradient(135deg,#CAFFBF,#A0C4FF); }
+.p-d { background: linear-gradient(135deg,#FFADAD,#FFD6A5); }
+.p-e { background: linear-gradient(135deg,#BDB2FF,#FFADAD); }
+.p-f { background: linear-gradient(135deg,#FDFFB6,#CAFFBF); }
+.p-g { background: linear-gradient(135deg,#A0C4FF,#CAFFBF); }
+.p-h { background: linear-gradient(135deg,#FFC9C9,#BDB2FF); }
+
+/* ========== 通用动画 ========== */
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+/* ========== 右上角版本标记 ========== */
+.proto-tag {
+  position: fixed; top: 14px; right: 16px; z-index: 200;
+  padding: 6px 14px; font-size: 12px; font-weight: 900; color: var(--brown-deep);
+  background: linear-gradient(180deg,#FFC9C9,#FFADAD);
+  border: var(--border-sm); border-radius: 999px; box-shadow: var(--shadow-sm);
+}
+
+/* 返回入口 */
+.back-link {
+  position: fixed; top: 14px; left: 16px; z-index: 200;
+  padding: 6px 14px; font-size: 12px; font-weight: 800; text-decoration: none;
+  color: var(--brown-deep); background: #fff;
+  border: var(--border-sm); border-radius: 999px; box-shadow: var(--shadow-sm);
+  transition: all .15s;
+}
+.back-link:hover { background: var(--yellow); transform: translate(-1px,-1px); }
