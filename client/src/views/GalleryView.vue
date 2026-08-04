@@ -36,9 +36,13 @@
 
     <!-- 内容区 -->
     <div class="content">
-      <div v-if="store.loading && store.images.length === 0" class="loading-state">
-        <Icon icon="lucide:loader" class="loading-emoji" />
-        <p>正在把图图们请出来～</p>
+      <!-- 加载中：骨架屏（比 spinner 更稳，减少布局跳动） -->
+      <div v-if="store.loading && store.images.length === 0" class="skeleton-grid">
+        <div v-for="i in 8" :key="i" class="skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+        </div>
       </div>
 
       <div v-else-if="store.filteredImages.length === 0" class="empty-state">
@@ -70,7 +74,7 @@
       :width="dialogWidth"
       :align-center="true"
       :modal-class="'preview-modal'"
-      :close-on-press-escape="false"
+      :close-on-press-escape="true"
       class="preview-dialog"
       @open="onDialogOpen"
       @closed="onDialogClosed"
@@ -85,6 +89,15 @@
           <span class="position-tag">
             {{ store.previewIndex + 1 }} / {{ store.filteredImages.length }}
           </span>
+          <!-- 自定义关闭按钮（之前 show-close=false 是因为图标风格不搭；现在自己画一个） -->
+          <button
+            class="preview-close-btn"
+            type="button"
+            aria-label="关闭预览"
+            @click="store.previewVisible = false"
+          >
+            <el-icon><Close /></el-icon>
+          </button>
         </div>
       </template>
 
@@ -147,6 +160,9 @@
           :class="{ 'is-zoomed': !isCurrentVideo && scale > 1.01, 'is-grabbing': isDragging }"
           @wheel="onWheel"
           @mousedown="onMouseDown"
+          @touchstart.passive="onTouchStart"
+          @touchmove.passive="onTouchMove"
+          @touchend="onTouchEnd"
         >
           <img
             v-if="!isCurrentVideo"
@@ -350,6 +366,67 @@ function cleanupDrag() {
   isDragging.value = false;
   document.body.removeEventListener('mousemove', onMouseMove);
   document.body.removeEventListener('mouseup', onMouseUp);
+}
+
+// ============ 触摸支持（手机双指缩放 + 单指拖动）============
+const touchState = ref({
+  pinchStartDist: 0,   // 双指起始距离
+  pinchStartScale: 1,  // 双指起始时的 scale
+  panStart: null,      // 单指拖动起点
+  panStartPan: { x: 0, y: 0 }
+});
+
+function getTouchDist(t1, t2) {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.hypot(dx, dy);
+}
+
+function onTouchStart(e) {
+  if (isCurrentVideo.value) return;
+  if (e.touches.length === 2) {
+    // 双指：开始捏合
+    touchState.value.pinchStartDist = getTouchDist(e.touches[0], e.touches[1]);
+    touchState.value.pinchStartScale = scale.value;
+  } else if (e.touches.length === 1) {
+    // 单指：如果已缩放，拖动平移
+    if (scale.value > 1.01) {
+      touchState.value.panStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      touchState.value.panStartPan = { x: panX.value, y: panY.value };
+    }
+  }
+}
+
+function onTouchMove(e) {
+  if (isCurrentVideo.value) return;
+  if (e.touches.length === 2 && touchState.value.pinchStartDist > 0) {
+    // 双指缩放：以起始距离的比例缩放
+    e.preventDefault?.();
+    const dist = getTouchDist(e.touches[0], e.touches[1]);
+    const ratio = dist / touchState.value.pinchStartDist;
+    const newScale = touchState.value.pinchStartScale * ratio;
+    setScale(newScale);
+  } else if (e.touches.length === 1 && touchState.value.panStart && scale.value > 1.01) {
+    // 单指拖动平移
+    const dx = e.touches[0].clientX - touchState.value.panStart.x;
+    const dy = e.touches[0].clientY - touchState.value.panStart.y;
+    panX.value = touchState.value.panStartPan.x + dx / scale.value;
+    panY.value = touchState.value.panStartPan.y + dy / scale.value;
+  }
+}
+
+function onTouchEnd(e) {
+  if (e.touches.length === 0) {
+    touchState.value.pinchStartDist = 0;
+    touchState.value.panStart = null;
+  } else if (e.touches.length === 1) {
+    // 双指变单指：重置
+    touchState.value.pinchStartDist = 0;
+    if (scale.value > 1.01) {
+      touchState.value.panStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      touchState.value.panStartPan = { x: panX.value, y: panY.value };
+    }
+  }
 }
 
 // 切换图片 / 关闭预览时重置缩放
@@ -568,10 +645,62 @@ onUnmounted(() => {
 @media (max-width: 768px)  { .image-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
 @media (max-width: 480px)  { .image-grid { grid-template-columns: 1fr; gap: 12px; } }
 
+/* ========== 骨架屏（替代 spinner）========== */
+.skeleton-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 1024px) { .skeleton-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px)  { .skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+@media (max-width: 480px)  { .skeleton-grid { grid-template-columns: 1fr; gap: 12px; } }
+
+.skeleton-card {
+  background: #fff;
+  border: 3px solid var(--cartoon-brown);
+  border-radius: var(--cartoon-radius);
+  box-shadow: 4px 4px 0 var(--cartoon-brown);
+  overflow: hidden;
+  padding: 0;
+}
+.skeleton-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(
+    90deg,
+    var(--cartoon-cream, #FFF6BD) 0%,
+    #FFE9C4 50%,
+    var(--cartoon-cream, #FFF6BD) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-line {
+  height: 10px;
+  margin: 10px 12px 6px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    #F0E6CC 0%,
+    #FAEBCF 50%,
+    #F0E6CC 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-line.short { width: 40%; }
+.skeleton-line + .skeleton-line { animation-delay: 0.15s; }
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .loading-state { text-align: center; padding: 60px 20px; }
 .loading-state .loading-emoji {
   font-size: 56px;
   color: var(--cartoon-pink);
+  /* 保留旧 spinner 样式以防其他地方用到 */
+  animation: spin 1.2s linear infinite;
   animation: spin 1.2s linear infinite;
   display: inline-block;
 }
@@ -619,6 +748,32 @@ onUnmounted(() => {
   box-shadow: 2px 2px 0 var(--cartoon-brown);
 }
 
+/* 弹窗右上角关闭按钮：自己画的，匹配卡通风格 */
+.preview-close-btn {
+  background: var(--cartoon-pink);
+  border: 2.5px solid var(--cartoon-brown);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--cartoon-brown);
+  transition: all 0.15s;
+  color: #fff;
+  flex-shrink: 0;
+}
+.preview-close-btn:hover {
+  background: var(--cartoon-yellow);
+  color: var(--cartoon-brown-deep);
+  transform: translate(-1px, -1px) rotate(90deg);
+  box-shadow: 3px 3px 0 var(--cartoon-brown);
+}
+.preview-close-btn:active {
+  transform: scale(0.95);
+}
+
 .preview-body {
   position: relative;
   display: flex;
@@ -633,6 +788,7 @@ onUnmounted(() => {
 .img-stage {
   max-width: 100%;
   max-height: 70vh;
+  touch-action: none;  /* 禁掉浏览器的默认 pinch / pan，我们自己处理 */
   display: flex;
   align-items: center;
   justify-content: center;

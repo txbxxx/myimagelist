@@ -2,7 +2,7 @@
   <header class="header">
     <div class="header-inner">
       <div class="logo" @click="$router.push('/gallery')">
-        <Icon icon="lucide:rabbit" class="logo-icon" />
+        <RabbitLogo :size="36" alt="兔子 logo" :animate="true" class="logo-icon" />
         <h1 class="logo-text">糖果图库</h1>
       </div>
       <nav class="nav" v-if="auth.isLoggedIn">
@@ -41,6 +41,7 @@ import {
   User, SwitchButton, UploadFilled, PriceTag, PictureFilled
 } from '@element-plus/icons-vue';
 import { Icon } from '@iconify/vue';
+import RabbitLogo from './RabbitLogo.vue';
 import { useAuthStore } from '../stores/auth';
 
 const auth = useAuthStore();

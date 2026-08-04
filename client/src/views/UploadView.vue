@@ -2,8 +2,8 @@
   <div class="upload-view">
     <div class="page-title">
       <Icon icon="lucide:cloud-upload" class="emoji" />
-      <h2>把宝贝图片传上来吧～</h2>
-      <p>支持 jpg / png / gif / webp，可以一次拖好多张</p>
+      <h2>把图片传上来吧～</h2>
+      <p>支持 jpg / png / gif / webp / mp4，可以一次拖好多张</p>
     </div>
 
     <!-- 分类选择 -->
@@ -260,6 +260,15 @@ async function submitUpload() {
 .drop-zone :deep(.el-upload) { width: 100%; }
 .drop-zone :deep(.el-upload-dragger) {
   width: 100%;
+}
+/* 拖拽进入时的明确反馈（Element Plus 默认只换 background，描边还是虚线不明显） */
+.drop-zone :deep(.el-upload-dragger.is-dragover) {
+  background: linear-gradient(135deg, #FFF6BD 0%, #FFE0EC 100%) !important;
+  border: 3px solid var(--cartoon-pink) !important;  /* 虚线变实线 + 粉色 */
+  border-radius: var(--cartoon-radius) !important;
+  box-shadow: 0 0 0 4px rgba(255, 173, 173, 0.3), 4px 4px 0 var(--cartoon-brown) !important;
+  transform: scale(1.01);
+  transition: all 0.15s;
 }
 .drop-content {
   display: flex;

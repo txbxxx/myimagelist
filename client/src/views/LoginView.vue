@@ -2,7 +2,7 @@
   <div class="login-view">
     <div class="login-card">
       <div class="login-header">
-        <Icon icon="lucide:rabbit" class="logo-bunny" />
+        <RabbitLogo :size="64" :animate="true" class="logo-bunny" alt="兔子 logo" />
         <h1>糖果图库</h1>
         <p>{{ isLogin ? '登录到你的图库' : '创建一个新账号' }}</p>
       </div>
@@ -86,6 +86,7 @@ import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { User, Lock, Right, InfoFilled } from '@element-plus/icons-vue';
 import { Icon } from '@iconify/vue';
+import RabbitLogo from '../components/RabbitLogo.vue';
 import { useAuthStore } from '../stores/auth';
 import { useGalleryStore } from '../stores/gallery';
 
