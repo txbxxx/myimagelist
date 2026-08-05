@@ -15,8 +15,13 @@
 
 ## 原型文件
 
+- **`color-variants-index.html`**：4 个风格版本的索引对比页，点击卡片进入对应原型。
+- **`color-cartoon-angular.html`**：版本 0 · 卡通 Angular，胶带贴纸 + 偏移硬阴影 + 波点背景 + 小圆角。
+- **`color-variant-sketch.html`**：版本 A · 手绘涂鸦，笔记本网格背景 + 蓝色点缀 + 虚线边框。
+- **`color-variant-pixel.html`**：版本 B · 复古像素，零圆角 + 4px 粗描边 + 棋盘格背景。
+- **`color-variant-collage.html`**：版本 C · 剪纸拼贴，错位阴影 + 胶带 + 薄荷绿点缀 + 波点背景。
 - **`color-restricted.html`**：左右对照原型，默认展示改后纯平色版本。
-- **`color-flat-only.html`**：纯平 4 色版完整原型，包含头部、画廊、上传区、登录页、预览弹窗，全程 0 渐变。
+- **`color-flat-only.html`**：纯平 4 色版完整原型，全程 0 渐变。
 
 ## 当前问题统计
 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>糖果图库 · 配色风格测试索引</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #FFF9E6;
+      --white: #FFFFFF;
+      --brown: #4A3B32;
+      --ink: #2E2019;
+      --border: 3px solid var(--brown);
+      --shadow: 5px 5px 0 var(--brown);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito', 'ZCOOL KuaiLe', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    .title { text-align: center; margin-bottom: 10px; }
+    .title h1 { margin: 0; font-size: 30px; }
+    .subtitle { text-align: center; color: #6b5b4f; font-weight: 800; margin-bottom: 30px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .variant-card {
+      display: block;
+      background: var(--white);
+      border: var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .variant-card:hover {
+      transform: translate(-4px,-4px);
+      box-shadow: 9px 9px 0 var(--brown);
+    }
+    .preview {
+      height: 160px;
+      display: grid;
+      place-items: center;
+      font-size: 52px;
+      border-bottom: var(--border);
+    }
+    .info { padding: 18px; }
+    .info h2 { margin: 0 0 8px; font-size: 19px; }
+    .info p { margin: 0 0 12px; color: #6b5b4f; font-weight: 700; font-size: 13px; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      padding: 3px 8px; border: 2px solid var(--brown); border-radius: 3px;
+      background: var(--cream); font-size: 11px; font-weight: 900;
+    }
+    .accent { margin-top: 12px; display: flex; gap: 8px; align-items: center; font-weight: 900; font-size: 13px; }
+    .swatch {
+      width: 26px; height: 26px; border: 2px solid var(--brown); border-radius: 4px;
+    }
+
+    /* 各版本预览背景 */
+    .v-angular { background: #FFADAD; }
+    .v-sketch { background: #A0C4FF; }
+    .v-pixel { background: #FFADAD; }
+    .v-collage { background: #CAFFBF; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">
+      <h1>🎨 糖果图库配色风格测试</h1>
+    </div>
+    <p class="subtitle">0 渐变 · 3~4 色 · 卡通 · 少圆角 — 点击卡片打开对应版本</p>
+
+    <div class="grid">
+      <a class="variant-card" href="./color-cartoon-angular.html">
+        <div class="preview v-angular">🐰</div>
+        <div class="info">
+          <h2>版本 0 · 卡通 Angular</h2>
+          <p>胶带贴纸 + 偏移硬阴影 + 波点背景 + 小圆角</p>
+          <div class="tags">
+            <span class="tag">贴纸感</span>
+            <span class="tag">虚线边框</span>
+            <span class="tag">方头兔子</span>
+          </div>
+          <div class="accent">
+            <div class="swatch" style="background:#FFF9E6"></div>
+            <div class="swatch" style="background:#FFF"></div>
+            <div class="swatch" style="background:#FFADAD"></div>
+            <div class="swatch" style="background:#4A3B32"></div>
+          </div>
+        </div>
+      </a>
+
+      <a class="variant-card" href="./color-variant-sketch.html">
+        <div class="preview v-sketch">✏️</div>
+        <div class="info">
+          <h2>版本 A · 手绘涂鸦</h2>
+          <p>笔记本网格背景 + 虚线边框 + 蓝色点缀 + 内虚线框</p>
+          <div class="tags">
+            <span class="tag">手绘感</span>
+            <span class="tag">蓝色点缀</span>
+            <span class="tag">网格背景</span>
+          </div>
+          <div class="accent">
+            <div class="swatch" style="background:#FFF9E6"></div>
+            <div class="swatch" style="background:#FFF"></div>
+            <div class="swatch" style="background:#A0C4FF"></div>
+            <div class="swatch" style="background:#4A3B32"></div>
+          </div>
+        </div>
+      </a>
+
+      <a class="variant-card" href="./color-variant-pixel.html">
+        <div class="preview v-pixel">🎮</div>
+        <div class="info">
+          <h2>版本 B · 复古像素</h2>
+          <p>零圆角 + 4px 粗描边 + 棋盘格背景 + 游戏 UI 感</p>
+          <div class="tags">
+            <span class="tag">零圆角</span>
+            <span class="tag">粗描边</span>
+            <span class="tag">棋盘格</span>
+          </div>
+          <div class="accent">
+            <div class="swatch" style="background:#FFF9E6"></div>
+            <div class="swatch" style="background:#FFF"></div>
+            <div class="swatch" style="background:#FFADAD"></div>
+            <div class="swatch" style="background:#4A3B32"></div>
+          </div>
+        </div>
+      </a>
+
+      <a class="variant-card" href="./color-variant-collage.html">
+        <div class="preview v-collage">✂️</div>
+        <div class="info">
+          <h2>版本 C · 剪纸拼贴</h2>
+          <p>错位阴影 + 胶带 + 斜置标题 + 薄荷绿点缀 + 波点背景</p>
+          <div class="tags">
+            <span class="tag">拼贴感</span>
+            <span class="tag">薄荷绿</span>
+            <span class="tag">错位阴影</span>
+          </div>
+          <div class="accent">
+            <div class="swatch" style="background:#FFF9E6"></div>
+            <div class="swatch" style="background:#FFF"></div>
+            <div class="swatch" style="background:#CAFFBF"></div>
+            <div class="swatch" style="background:#4A3B32"></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
