@@ -76,7 +76,9 @@
       :modal-class="'preview-modal'"
       :close-on-press-escape="true"
       class="preview-dialog"
+      :aria-label="store.currentPreviewImage ? `图片预览：${store.currentPreviewImage.originalName}` : '图片预览'"
       @open="onDialogOpen"
+      @opened="onDialogOpened"
       @closed="onDialogClosed"
     >
       <template #header>
@@ -91,6 +93,7 @@
           </span>
           <!-- 自定义关闭按钮（之前 show-close=false 是因为图标风格不搭；现在自己画一个） -->
           <button
+            ref="closeBtnRef"
             class="preview-close-btn"
             type="button"
             aria-label="关闭预览"
@@ -234,6 +237,7 @@ import ImageCard from '../components/ImageCard.vue';
 
 const store = useGalleryStore();
 const dialogRef = ref();
+const closeBtnRef = ref();  // 关闭按钮 ref，用于弹窗打开时把焦点移过来（a11y）
 
 // 响应式对话框宽度（PC 宽，手机窄）
 const dialogWidth = ref('70%');
@@ -252,6 +256,13 @@ function onDialogOpen() {
   updateDialogWidth();
   // Element Plus dialog 用 teleport 渲染到 body 末尾，绑在 document.body 上最稳
   document.body.addEventListener('keydown', onKey, true);
+}
+function onDialogOpened() {
+  // 弹窗打开动画结束后，把焦点移到关闭按钮（a11y：键盘用户能立刻按 Enter/Esc 关闭）
+  // 用 $nextTick 防止动画过程中 ref 还没渲染
+  setTimeout(() => {
+    closeBtnRef.value?.focus?.({ preventScroll: true });
+  }, 50);
 }
 function onDialogClosed() {
   document.body.removeEventListener('keydown', onKey, true);
@@ -767,7 +778,7 @@ onUnmounted(() => {
 .preview-close-btn:hover {
   background: var(--cartoon-yellow);
   color: var(--cartoon-brown-deep);
-  transform: translate(-1px, -1px) rotate(90deg);
+  transform: translate(-1px, -1px) rotate(90deg) scale(1.1);
   box-shadow: 3px 3px 0 var(--cartoon-brown);
 }
 .preview-close-btn:active {

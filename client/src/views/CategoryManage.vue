@@ -186,8 +186,9 @@ const palette = [
 ];
 
 // 给色板按钮一个文字提示（对比度怎么样）
+// 注：基准色已经从 #3E2723 升级到 #2E2019（与 readableTextColor 保持一致）
 function contrastLabel(hex) {
-  const r = contrastRatio(hex, '#3E2723');
+  const r = contrastRatio(hex, '#2E2019');
   if (r == null) return '';
   if (r >= 7) return `对比度 ${r.toFixed(1)}（优秀）`;
   if (r >= 4.5) return `对比度 ${r.toFixed(1)}（达标）`;

@@ -23,10 +23,11 @@
         <span class="cat-dot" :style="{ background: catTextColor }"></span>
         {{ category.name }}
       </div>
-      <!-- 右上：下载按钮 -->
+      <!-- 右上：下载按钮（aria-label 让读屏器能念出文件名） -->
       <button
         class="dl-btn"
         :title="isVideo ? '下载原视频' : '下载原图'"
+        :aria-label="(isVideo ? '下载视频 ' : '下载图片 ') + (image.originalName || '')"
         @click.stop="handleDownload"
       >
         <el-icon><Download /></el-icon>
@@ -298,6 +299,15 @@ function handleDownload() {
 .image-card:hover .dl-btn {
   opacity: 1;
   transform: translateY(0) rotate(0);
+}
+
+/* 键盘 Tab 到卡片时也显示（accessibility：focus-within） */
+.image-card:focus-within .dl-btn {
+  opacity: 1;
+  transform: translateY(0) rotate(0);
+}
+.image-card:focus-within .hover-mask {
+  opacity: 1;
 }
 
 /* 触屏设备：没有 hover，默认就把下载按钮和遮罩露出来 */

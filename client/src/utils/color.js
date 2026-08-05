@@ -51,8 +51,11 @@ export function contrastRatio(hex1, hex2) {
 
 /**
  * 给定背景色，返回对深色或浅色文字的对比度
+ * - 深色基准用 --cartoon-ink (#2E2019)，比 brown-deep 更深
+ *   原因：浅糖果色底上（如 #FDFFB6 / #FFE0EC）#2E2019 比 #3E2723 对比度高约 2 级，
+ *   即使在最浅的色板上也能稳过 WCAG AA 4.5:1
  */
-export function contrastWithDark(hex)  { return contrastRatio(hex, '#3E2723'); }  // cartoon-brown-deep
+export function contrastWithDark(hex)  { return contrastRatio(hex, '#2E2019'); }  // --cartoon-ink
 export function contrastWithLight(hex) { return contrastRatio(hex, '#FFFFFF'); }
 
 /**
@@ -61,16 +64,16 @@ export function contrastWithLight(hex) { return contrastRatio(hex, '#FFFFFF'); }
  * - 取对比度更高的那个文字色
  * @param {string} bgHex
  * @param {number} [minRatio=4.5]
- * @returns {string}  '#FFFFFF' or '#3E2723'
+ * @returns {string}  '#FFFFFF' or '#2E2019'
  */
 export function readableTextColor(bgHex, minRatio = 4.5) {
   const dark  = contrastWithDark(bgHex)  ?? 0;
   const light = contrastWithLight(bgHex) ?? 0;
   // 都达不到 AA → 选相对更亮的（白底深褐也凑合能看）
   if (dark < minRatio && light < minRatio) {
-    return light > dark ? '#FFFFFF' : '#3E2723';
+    return light > dark ? '#FFFFFF' : '#2E2019';
   }
-  return dark >= light ? '#3E2723' : '#FFFFFF';
+  return dark >= light ? '#2E2019' : '#FFFFFF';
 }
 
 /**

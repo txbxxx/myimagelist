@@ -3,9 +3,11 @@
    ============================================= */
 
 :root {
+  /* 基础色板（11 色糖果 + 主色） */
   --cartoon-bg: #FFF9E6;
   --cartoon-bg-soft: #FFF0F5;
   --cartoon-blue: #A0C4FF;
+  --cartoon-blue-deep: #7AA8F0;
   --cartoon-mint: #CAFFBF;
   --cartoon-pink: #FFADAD;
   --cartoon-yellow: #FDFFB6;
@@ -13,11 +15,32 @@
   --cartoon-peach: #FFD6A5;
   --cartoon-brown: #4A3B32;
   --cartoon-brown-deep: #3E2723;
-  --cartoon-shadow: 4px 4px 0px #4A3B32;
-  --cartoon-shadow-hover: 6px 6px 0px #4A3B32;
+  --cartoon-ink: #2E2019;          /* 高对比文字色，对浅糖果底仍能 4.5:1+ */
+  --cartoon-white: #FFFFFF;        /* 显式声明，方便深色背景主题切换 */
+
+  /* 形状 */
   --cartoon-radius: 18px;
   --cartoon-radius-sm: 12px;
-  --cartoon-border: 3px solid #4A3B32;
+  --cartoon-border: 3px solid var(--cartoon-brown);
+  --cartoon-shadow: 4px 4px 0px var(--cartoon-brown);
+  --cartoon-shadow-hover: 6px 6px 0px var(--cartoon-brown);
+  --cartoon-shadow-sm: 2px 2px 0 var(--cartoon-brown);
+
+  /* 字号阶梯（report 3.2 节提到字号自由发挥，统一收敛） */
+  --cartoon-fs-xs: 12px;
+  --cartoon-fs-sm: 14px;
+  --cartoon-fs-md: 16px;
+  --cartoon-fs-lg: 20px;
+  --cartoon-fs-xl: 28px;
+
+  /* 间距阶梯（让 margin/padding 也有节奏） */
+  --cartoon-sp-1: 6px;
+  --cartoon-sp-2: 12px;
+  --cartoon-sp-3: 18px;
+  --cartoon-sp-4: 24px;
+
+  /* 焦点环（a11y，prototype 双层环方案） */
+  --cartoon-focus-ring: 0 0 0 3px var(--cartoon-bg), 0 0 0 6px var(--cartoon-blue-deep);
 }
 
 * {
@@ -333,21 +356,27 @@ body {
 }
 
 /* =============================================
-   可访问性：键盘焦点环
+   可访问性：键盘焦点环（双层环方案）
    - 之前自定义 box-shadow 覆盖了浏览器默认 focus
    - 用 :focus-visible（只对键盘生效，不影响鼠标点击）
-   - 高对比的卡通风格焦点环
+   - prototype.html 方案：内层用背景色、外层用深蓝，无论在哪种糖果色背景上都清晰
    ============================================= */
 *:focus-visible {
-  outline: 3px solid var(--cartoon-blue, #A0C4FF);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: none;
+  box-shadow: var(--cartoon-focus-ring);
+  border-radius: 8px;
 }
 
-/* 按钮类元素的焦点环要更醒目（白底加蓝色描边） */
+/* 按钮/输入框的焦点环要更醒目（白底加蓝色描边） */
 button:focus-visible,
-.el-button:focus-visible {
-  outline: 3px solid var(--cartoon-blue, #A0C4FF);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 3px #fff inset;
+.el-button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--cartoon-focus-ring);
+}
+
+/* 输入框聚焦时需要盖住内阴影（不然会被 inset shadow 干扰） */
+.el-input__wrapper.is-focus:focus-visible {
+  box-shadow: 0 0 0 3px var(--cartoon-bg) inset, var(--cartoon-focus-ring) !important;
 }
