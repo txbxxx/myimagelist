@@ -289,13 +289,14 @@
 <body>
   <h1 class="page-title">🍬 糖果图库 · 配色精简对比</h1>
   <p class="page-sub">
-    当前页面使用了大量糖果渐变与多色标签。下面给出「3~4 色扁平版」方案：保留卡通描边和圆角，只保留奶油底、咖啡描边、粉点缀、白卡片四种核心色。
+    当前页面使用了大量糖果渐变与多色标签。下面给出「3~4 色扁平版」方案：保留卡通描边和圆角，只保留奶油底、咖啡描边、粉点缀、白卡片四种核心色。<br>
+    <strong>默认展示改后纯平色版，点击切换可查看旧版对照。</strong>
   </p>
 
   <div class="switcher">
-    <button class="chip active" onclick="showBoth()">左右对照</button>
-    <button class="chip" onclick="showBefore()">只看改前</button>
-    <button class="chip" onclick="showAfter()">只看改后</button>
+    <button class="chip" onclick="showBoth()">左右对照</button>
+    <button class="chip" onclick="showBefore()">只看改前（有渐变）</button>
+    <button class="chip active" onclick="showAfter()">只看改后（无渐变）</button>
   </div>
 
   <div class="stage" id="stage">
@@ -498,6 +499,9 @@
       afterPanel.style.display = 'block';
       setActive(2);
     }
+
+    // 默认显示无渐变的改后版本
+    showAfter();
   </script>
 </body>
 </html>
