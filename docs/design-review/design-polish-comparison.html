@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>糖果图库 · 4 处细节优化对比</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF9E6; --bg-soft: #FFF0F5;
+  --blue: #A0C4FF; --mint: #CAFFBF; --pink: #FFADAD;
+  --yellow: #FDFFB6; --peach: #FFD6A5; --brown: #4A3B32;
+  --brown-deep: #3E2723; --ink: #2E2019; --white: #FFFFFF;
+  --radius: 18px; --radius-sm: 12px;
+  --border: 3px solid var(--brown); --shadow: 4px 4px 0 var(--brown);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--ink); padding: 24px;
+}
+h1 { font-size: 28px; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+h2 { font-size: 20px; color: var(--brown-deep); }
+.sub { margin-bottom: 18px; font-size: 14px; color: #7a6a60; }
+.section {
+  max-width: 1000px; margin: 0 auto 24px;
+  background: var(--white); border: var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px;
+}
+.head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.badge { font-size: 11px; font-weight: 900; padding: 3px 12px; border-radius: 999px; border: 2px solid var(--brown); }
+.badge.mid { background: var(--yellow); }
+.badge.low { background: var(--mint); }
+.desc { font-size: 14px; margin-bottom: 16px; color: #5a4a42; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+.pane { border: var(--border); border-radius: var(--radius-sm); box-shadow: 2px 2px 0 var(--brown); overflow: hidden; }
+.pane-title { padding: 8px 14px; font-weight: 900; font-size: 13px; border-bottom: var(--border); }
+.pane.before .pane-title { background: #F3E9E2; color: #8a7a70; }
+.pane.after .pane-title { background: var(--mint); color: var(--brown-deep); }
+.pane-body { padding: 18px; background: var(--bg); min-height: 120px; }
+
+/* 上传区 */
+.dropzone {
+  border: 3px dashed var(--brown); border-radius: var(--radius); background: var(--bg-soft);
+  padding: 28px; text-align: center; transition: all 0.2s; cursor: pointer;
+}
+.dropzone .cloud { font-size: 40px; display: block; }
+.dropzone.drag-over { border-style: solid; background: var(--mint); transform: scale(1.02); }
+.demo-btn {
+  margin-top: 12px; padding: 8px 16px; border: var(--border); border-radius: 999px;
+  background: var(--blue); box-shadow: var(--shadow); font-weight: 900; cursor: pointer;
+}
+
+/* 色点 */
+.color-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-dot {
+  width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid var(--brown);
+  box-shadow: 2px 2px 0 var(--brown); cursor: pointer; position: relative;
+}
+.color-dot.active::after {
+  content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 900; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.5);
+}
+
+/* 导航 */
+.header {
+  background: linear-gradient(180deg, #FFFBE6, #FFF0F5); border-bottom: var(--border);
+  box-shadow: 0 4px 0 var(--brown); padding: 12px 16px; border-radius: var(--radius-sm);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 22px; }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-link { padding: 6px 14px; border: 2.5px solid var(--brown); border-radius: 999px; background: #fff; font-weight: 800; box-shadow: 2px 2px 0 var(--brown); }
+.user-box { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border: 2.5px solid var(--brown); border-radius: 999px; background: #fff; box-shadow: 2px 2px 0 var(--brown); font-size: 13px; }
+
+/* 改后移动端导航 */
+.header-fixed {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+}
+.header-fixed .nav { justify-self: end; }
+
+/* 术语 */
+.term { font-size: 16px; font-weight: 800; }
+.term-old { color: #a08a7d; text-decoration: line-through; }
+.term-new { color: var(--brown-deep); }
+
+.note {
+  margin-top: 12px; font-size: 12px; background: var(--bg-soft);
+  border: 2px dashed var(--brown); border-radius: var(--radius-sm); padding: 8px 12px;
+}
+</style>
+</head>
+<body>
+
+<header class="section" style="background: var(--bg-soft);">
+  <h1>🍡 糖果图库 · 4 处细节优化对比</h1>
+  <p class="sub">基于昨天代码落地后的 UI 现状，把「还可以更好」的 4 个小点做成改前改后对照。</p>
+</header>
+
+<!-- 1. 上传 drag-over -->
+<section class="section">
+  <div class="head"><h2>1. 上传区 drag-over 反馈</h2><span class="badge mid">中优先级</span></div>
+  <p class="desc">改前：用户拖文件进来时，上传区没有任何视觉变化；改后：虚线变实线、背景变薄荷绿、轻微放大。</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：拖入无反馈</div>
+      <div class="pane-body">
+        <div class="dropzone">
+          <span class="cloud">☁️</span>
+          <strong>把图片或视频拖到这里</strong><br>
+          <small>支持 jpg / png / gif / webp / mp4</small>
+        </div>
+      </div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：拖入高亮</div>
+      <div class="pane-body">
+        <div class="dropzone drag-over" id="dz1">
+          <span class="cloud">☁️</span>
+          <strong>把图片或视频拖到这里</strong><br>
+          <small>支持 jpg / png / gif / webp / mp4</small>
+        </div>
+        <button class="demo-btn" onclick="toggleDz()">🖱️ 模拟拖入</button>
+      </div>
+    </div>
+  </div>
+  <div class="note">💡 实现：给 el-upload 的 drag 区域加 .drop-zone.is-dragover 样式（border-style:solid; background:var(--cartoon-mint); transform:scale(1.02)）。</div>
+</section>
+
+<!-- 2. 编辑模式色点 aria-label -->
+<section class="section">
+  <div class="head"><h2>2. 编辑分类时色点加 aria-label</h2><span class="badge low">低优先级</span></div>
+  <p class="desc">改前：编辑模式下颜色选择器里的色点没有标签，屏幕阅读器用户不知道当前选的是哪个；改后：每个色点都带 `aria-label="颜色 柠檬黄（对比度 4.9:1）"`。</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：编辑色点无描述</div>
+      <div class="pane-body">
+        <div class="color-picker">
+          <button class="color-dot" style="background:#FFD6A5;"></button>
+          <button class="color-dot active" style="background:#FDFFB6;"></button>
+          <button class="color-dot" style="background:#FFADAD;"></button>
+          <button class="color-dot" style="background:#CAFFBF;"></button>
+        </div>
+        <p class="note">读屏器只会播报「按钮 已选中」，不知道颜色。</p>
+      </div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：每个色点可读</div>
+      <div class="pane-body">
+        <div class="color-picker">
+          <button class="color-dot" style="background:#FFD6A5;" aria-label="颜色 蜜桃橘，对比度 4.6 比 1"></button>
+          <button class="color-dot active" style="background:#FDFFB6;" aria-label="颜色 柠檬黄，对比度 4.9 比 1"></button>
+          <button class="color-dot" style="background:#FFADAD;" aria-label="颜色 樱花粉，对比度 5.3 比 1"></button>
+          <button class="color-dot" style="background:#CAFFBF;" aria-label="颜色 薄荷绿，对比度 5.5 比 1"></button>
+        </div>
+        <p class="note">读屏器会播报「颜色 柠檬黄，对比度 4.9 比 1，已选中」。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 移动端导航 -->
+<section class="section">
+  <div class="head"><h2>3. 移动端顶部导航防换行</h2><span class="badge mid">中优先级</span></div>
+  <p class="desc">改前：375px 下 header-inner 用 flex 两端对齐，用户区会被挤到第二行；改后：用 grid 三列布局（Logo | 导航 | 用户），必要时导航换行但整体不塌。</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：用户区被挤下第二行</div>
+      <div class="pane-body" style="max-width:375px; margin:0 auto;">
+        <div class="header">
+          <div class="header-inner">
+            <div class="logo">🐰 糖果图库</div>
+            <div class="nav"><span class="nav-link active">画廊</span><span class="nav-link">上传</span><span class="nav-link">分类</span></div>
+            <div class="user-box"><span>design_review_user</span><span class="nav-link" style="padding:4px 10px;font-size:12px;">退出</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：grid 三列，结构更稳</div>
+      <div class="pane-body" style="max-width:375px; margin:0 auto;">
+        <div class="header">
+          <div class="header-inner" style="display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;">
+            <div class="logo">🐰 糖果图库</div>
+            <div class="nav" style="justify-self:end;"><span class="nav-link active">画廊</span><span class="nav-link">上传</span></div>
+            <div class="user-box"><span>退出</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">💡 更激进的方案：小屏把用户区收进头像下拉菜单，导航用 icon-only。</div>
+</section>
+
+<!-- 4. 术语统一 -->
+<section class="section">
+  <div class="head"><h2>4. 页面术语统一</h2><span class="badge low">低优先级</span></div>
+  <p class="desc">改前：Logo、标题、空态文案人称/风格不统一；改后：标题更利落，空态保留可爱但减少无意义拟声词。</p>
+  <div class="compare">
+    <div class="pane before">
+      <div class="pane-title">😢 改前：语气词多、称呼杂</div>
+      <div class="pane-body">
+        <p class="term-old">画廊页标题：我的糖果图库</p>
+        <p class="term-old">上传页标题：把图片传上来吧～</p>
+        <p class="term-old">空态文案：画廊还是空的～去上传第一张图吧！</p>
+      </div>
+    </div>
+    <div class="pane after">
+      <div class="pane-title">😊 改后：简洁一致</div>
+      <div class="pane-body">
+        <p class="term-new">画廊页标题：画廊</p>
+        <p class="term-new">上传页标题：上传图片</p>
+        <p class="term-new">空态文案：还没有图片，去上传第一张吧 🐰</p>
+      </div>
+    </div>
+  </div>
+  <div class="note">💡 也可以保留品牌个性，只要定一个「标题 = 功能名」的规则即可。</div>
+</section>
+
+<script>
+function toggleDz() {
+  const dz = document.getElementById('dz1');
+  dz.classList.toggle('drag-over');
+}
+</script>
+</body>
+</html>
