@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果图库 · v4 混合视图原型</title>
+<link rel="stylesheet" href="_cartoon.css" />
+<style>
+  :root {
+    --skel:#4A3B32; --ink:#3E2723; --ink-soft:#7A675A;
+    --bg:#FFF9E6; --surface:#FFFFFF;
+    --c-main:#A0C4FF; --c-ok:#CAFFBF; --c-danger:#FFADAD; --c-purple:#BDB2FF; --c-peach:#FFD6A5; --c-warn:#FDFFB6;
+    --shadow:4px 4px 0 var(--skel); --shadow-sm:2px 2px 0 var(--skel); --shadow-lg:6px 6px 0 var(--skel);
+    --line:2.5px solid var(--skel); --line-thin:2px solid var(--skel);
+    --r-card:12px; --r-pill:999px;
+  }
+  body { color:var(--ink); }
+
+  /* ===== 顶栏 ===== */
+  .topbar { background:linear-gradient(180deg,#FFFBE6,#FFF0F5); border-bottom:var(--line); box-shadow:0 4px 0 var(--skel); position:sticky; top:0; z-index:40; }
+  .topbar-inner { max-width:1280px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .logo { display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .logo .e { font-size:30px; transition:transform .3s; }
+  .logo:hover .e { transform:rotate(-12deg) scale(1.1); }
+  .logo b { font-size:20px; font-weight:900; letter-spacing:1px; color:var(--ink); }
+  .nav { display:flex; gap:7px; }
+  .nav a { text-decoration:none; padding:7px 16px; font-size:14px; font-weight:800; color:var(--ink); background:var(--bg); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all .15s; }
+  .nav a:hover { transform:translate(-1px,-1px); background:var(--c-warn); }
+  .nav a.on { background:var(--c-main); }
+  .search { flex:1; min-width:160px; max-width:360px; display:flex; align-items:center; gap:7px; padding:7px 16px; background:var(--surface); border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-sm); }
+  .search .ico { opacity:.55; font-size:14px; }
+  .search input { border:0; outline:0; background:transparent; font:inherit; font-size:13px; font-weight:700; color:var(--ink); flex:1; }
+  .search input::placeholder { color:var(--ink-soft); opacity:.6; }
+  .view-switch { display:flex; gap:5px; }
+  .view-switch button { width:38px; height:38px; font-size:16px; cursor:pointer; background:var(--surface); border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-sm); color:var(--ink); transition:all .15s; }
+  .view-switch button:hover { background:var(--c-warn); }
+  .view-switch button.on { background:var(--c-main); }
+  .user { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:800; color:var(--ink); padding:4px 12px 4px 6px; background:var(--surface); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); }
+  .user .ava { width:26px; height:26px; border-radius:50%; background:var(--c-danger); border:2px solid var(--skel); display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .btn-exit { padding:4px 12px; font-size:12px; font-weight:800; color:var(--ink); background:var(--bg); border:var(--line-thin); border-radius:var(--r-pill); box-shadow:1px 1px 0 var(--skel); cursor:pointer; }
+
+  /* ===== 分类 chip ===== */
+  .chip-row { max-width:1280px; margin:0 auto; padding:12px 20px 14px; display:flex; gap:8px; overflow-x:auto; align-items:center; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:13px; font-weight:800; color:var(--ink); background:var(--surface); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); cursor:pointer; white-space:nowrap; transition:transform .15s; }
+  .chip:hover { transform:translate(-1px,-1px); }
+  .chip.on { background:var(--c-main); }
+  .chip .dot { width:9px; height:9px; border-radius:50%; border:2px solid var(--skel); }
+  .chip i { font-style:normal; font-size:11px; padding:0 7px; border-radius:var(--r-pill); background:rgba(74,59,50,.12); }
+
+  /* ===== 主区 ===== */
+  .main { max-width:1280px; margin:0 auto; padding:6px 20px 70px; }
+  .selbar { display:none; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 16px; }
+  .selbar.show { display:flex; }
+  .selbar .count { display:inline-flex; align-items:center; gap:6px; padding:7px 16px; font-size:14px; font-weight:900; background:var(--c-ok); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); }
+  .selbar .act { padding:7px 16px; font-size:13px; font-weight:800; color:var(--ink); background:var(--c-main); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); cursor:pointer; }
+  .selbar .act.danger { background:var(--c-danger); }
+  .selbar .hint { font-size:12px; font-weight:700; color:var(--ink-soft); }
+
+  .date-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; margin:20px 0 12px; background:var(--c-warn); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); font-weight:900; font-size:14px; }
+  .date-pill .sub { font-size:12px; font-weight:800; color:var(--ink-soft); }
+  .group-title { display:flex; align-items:baseline; gap:10px; margin:24px 0 14px; }
+  .group-title h3 { margin:0; font-size:19px; font-weight:900; }
+  .group-title .sub { font-size:13px; font-weight:800; color:var(--ink-soft); }
+
+  .t-main{background:var(--c-main)} .t-ok{background:var(--c-ok)} .t-danger{background:var(--c-danger)} .t-purple{background:var(--c-purple)} .t-peach{background:var(--c-peach)} .t-warn{background:var(--c-warn)}
+
+  .badge { position:absolute; padding:2px 8px; font-size:10px; font-weight:900; color:#fff; border:var(--line-thin); border-radius:var(--r-pill); box-shadow:1px 1px 0 var(--skel); }
+  .badge.video { background:linear-gradient(180deg,#FF7A7A,#E54444); }
+  .badge.gif { background:var(--c-purple); color:var(--ink); }
+
+  /* ===== 视图1：时间线密集网格 ===== */
+  .jrow { display:flex; gap:4px; height:188px; margin-bottom:4px; }
+  .jitem { position:relative; flex-basis:0; flex-grow:var(--ar,1); height:100%; border:var(--line-thin); border-radius:var(--r-card); box-shadow:var(--shadow-sm); cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:30px; transition:transform .15s, box-shadow .15s, filter .15s; }
+  .jitem:hover { transform:translateY(-3px); filter:brightness(1.05); box-shadow:var(--shadow); z-index:3; }
+  .jitem .cap { position:absolute; left:0; right:0; bottom:0; padding:14px 8px 5px; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(transparent,rgba(62,39,35,.8)); opacity:0; transition:opacity .15s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jitem:hover .cap { opacity:1; }
+
+  /* ===== 视图2：瀑布流 ===== */
+  .masonry { column-count:4; column-gap:16px; }
+  @media (max-width:1024px){.masonry{column-count:3}} @media (max-width:768px){.masonry{column-count:2}} @media (max-width:480px){.masonry{column-count:1}}
+  .mcard { position:relative; break-inside:avoid; margin-bottom:16px; border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-sm); overflow:hidden; cursor:pointer; background:var(--surface); transition:transform .18s, box-shadow .18s; }
+  .mcard:hover { transform:translate(-3px,-3px) rotate(-.4deg); box-shadow:var(--shadow-lg); }
+  .mcard .thumb { display:flex; align-items:center; justify-content:center; font-size:32px; border-radius:0; position:relative; }
+  .mcard .info { padding:8px 10px 10px; }
+  .mcard .name { font-size:12px; font-weight:800; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mcard .meta { font-size:10px; font-weight:700; color:var(--ink-soft); margin-top:2px; }
+
+  /* ===== 视图3：时刻分组 + 多选 ===== */
+  .mogrid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+  @media (max-width:1024px){.mogrid{grid-template-columns:repeat(4,1fr)}} @media (max-width:768px){.mogrid{grid-template-columns:repeat(3,1fr);gap:12px}} @media (max-width:480px){.mogrid{grid-template-columns:repeat(2,1fr)}}
+  .mocard { position:relative; aspect-ratio:1/1; border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-sm); overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:34px; transition:transform .15s, box-shadow .15s; }
+  .mocard:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
+  .mocard .check { position:absolute; top:8px; left:8px; width:28px; height:28px; border-radius:50%; border:2.5px solid #fff; background:rgba(62,39,35,.32); display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; font-weight:900; opacity:0; transform:scale(.85); transition:all .15s; z-index:3; }
+  .mocard:hover .check { opacity:1; transform:scale(1); }
+  .mocard.sel { box-shadow:0 0 0 3px var(--c-ok), var(--shadow); }
+  .mocard.sel .check { opacity:1; transform:scale(1); background:var(--c-ok); border-color:var(--skel); color:var(--ink); }
+
+  /* ===== 视图4：混合视图（新方案）===== */
+  .hybrid .hybrid-row { display:flex; gap:12px; margin-bottom:16px; align-items:flex-start; }
+  .hybrid .day-col { width:86px; flex-shrink:0; padding-top:4px; }
+  .hybrid .day-num { font-size:34px; font-weight:900; line-height:1; color:var(--c-main); text-shadow:2px 2px 0 var(--skel); }
+  .hybrid .day-meta { font-size:11px; font-weight:800; color:var(--ink-soft); margin-top:4px; }
+  .hybrid .day-content { flex:1; }
+  .hybrid .hgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+  @media (max-width:600px){ .hybrid .hgrid{ grid-template-columns:repeat(2,1fr); } .hybrid .day-col{ width:60px; } .hybrid .day-num{ font-size:24px; } }
+  .hcard { position:relative; aspect-ratio:1/1; border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-sm); overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:28px; transition:transform .15s, box-shadow .15s; }
+  .hcard:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
+  .hcard .check { position:absolute; top:6px; left:6px; width:24px; height:24px; border-radius:50%; border:2.5px solid #fff; background:rgba(62,39,35,.32); display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:900; opacity:0; transform:scale(.85); transition:all .15s; z-index:3; }
+  .hcard:hover .check { opacity:1; transform:scale(1); }
+  .hcard.sel { box-shadow:0 0 0 3px var(--c-ok), var(--shadow); }
+  .hcard.sel .check { opacity:1; transform:scale(1); background:var(--c-ok); border-color:var(--skel); color:var(--ink); }
+  .hcard .cap { position:absolute; left:0; right:0; bottom:0; padding:10px 6px 4px; font-size:10px; font-weight:800; color:#fff; background:linear-gradient(transparent,rgba(62,39,35,.75)); opacity:0; transition:opacity .15s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hcard:hover .cap { opacity:1; }
+
+  /* ===== 预览弹窗 ===== */
+  .modal { position:fixed; inset:0; background:rgba(62,39,35,.55); display:none; align-items:center; justify-content:center; z-index:100; padding:20px; }
+  .modal.show { display:flex; }
+  .dialog { width:min(720px,100%); background:var(--surface); border:var(--line); border-radius:var(--r-card); box-shadow:8px 8px 0 var(--skel); overflow:hidden; }
+  .dialog .dh { display:flex; align-items:center; gap:10px; padding:13px 18px; background:var(--bg); border-bottom:var(--line); }
+  .dialog .dh .fname { font-size:15px; font-weight:900; color:var(--ink); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dialog .dh .pos { padding:2px 12px; font-size:12px; font-weight:900; background:var(--c-purple); border:var(--line-thin); border-radius:var(--r-pill); }
+  .dialog .dh .x { width:30px; height:30px; cursor:pointer; background:var(--surface); border:var(--line-thin); border-radius:var(--r-card); box-shadow:1px 1px 0 var(--skel); display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .dialog .db { padding:20px; display:flex; align-items:center; justify-content:center; background:repeating-linear-gradient(45deg,var(--bg),var(--bg) 10px,#FFF0E6 10px,#FFF0E6 20px); position:relative; }
+  .dialog .db .stage { width:100%; min-height:240px; border:var(--line); border-radius:var(--r-card); box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center; font-size:80px; }
+  .dialog .nav-arrow { position:absolute; top:50%; transform:translateY(-50%); width:42px; height:42px; cursor:pointer; background:var(--surface); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
+  .dialog .nav-arrow.prev { left:30px; } .dialog .nav-arrow.next { right:30px; }
+  .dialog .df { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 18px; border-top:2px dashed #e0d4c0; flex-wrap:wrap; }
+  .dialog .meta { display:flex; gap:7px; flex-wrap:wrap; }
+  .dialog .meta span { font-size:12px; font-weight:800; color:var(--ink); padding:3px 10px; background:var(--bg); border:var(--line-thin); border-radius:var(--r-pill); display:inline-flex; align-items:center; gap:4px; }
+  .dialog .acts { display:flex; gap:8px; }
+  .dlg-btn { padding:8px 18px; font-size:13px; font-weight:800; color:var(--ink); background:var(--c-main); border:var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+  .dlg-btn:hover { transform:translate(-1px,-1px); }
+  .dlg-btn.ghost { background:var(--bg); }
+  .dlg-btn.ok { background:var(--c-ok); }
+
+  .pane { display:none; }
+  .pane.on { display:block; }
+
+  @media (max-width:600px){ .jrow{height:120px} .nav a{padding:6px 12px;font-size:12px} .dialog .nav-arrow{display:none} }
+  @media (max-width:600px){ .topbar-inner{ display:grid; grid-template-columns:auto 1fr auto; gap:10px; } .nav{ justify-self:end; } }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo"><span class="e">🐰</span><b>糖果图库</b></div>
+      <nav class="nav">
+        <a class="on">🖼️ 画廊</a>
+        <a>⬆ 上传</a>
+        <a>🏷️ 分类</a>
+      </nav>
+      <div class="search"><span class="ico">🔍</span><input placeholder="搜索照片、分类、日期…" /></div>
+      <div class="view-switch">
+        <button class="on" data-v="hybrid" title="混合视图">▦</button>
+        <button data-v="timeline" title="时间线密集网格">▤</button>
+        <button data-v="masonry" title="瀑布流">▥</button>
+        <button data-v="moments" title="时刻多选">▢</button>
+      </div>
+      <div class="user"><span class="ava">🐰</span>小兔子<button class="btn-exit">退出</button></div>
+    </div>
+    <div class="chip-row" id="chipRow"></div>
+  </header>
+
+  <main class="main">
+    <div class="selbar" id="selbar">
+      <span class="count">✔ 已选 <b id="selCount">0</b> 张</span>
+      <span class="act">⬇ 下载</span>
+      <span class="act">🏷️ 移动分类</span>
+      <span class="act danger">🗑 删除</span>
+      <span class="hint">· 点卡片左上圈勾选</span>
+    </div>
+
+    <div class="pane on" id="pane-hybrid"></div>
+    <div class="pane" id="pane-timeline"></div>
+    <div class="pane" id="pane-masonry"></div>
+    <div class="pane" id="pane-moments"></div>
+  </main>
+
+  <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="dialog" style="position:relative">
+      <div class="dh">
+        <span style="font-size:18px">🖼️</span>
+        <span class="fname" id="dlgName">—</span>
+        <span class="pos" id="dlgPos">1 / 1</span>
+        <span class="x" onclick="closeModal()">✕</span>
+      </div>
+      <div class="db">
+        <div class="nav-arrow prev" onclick="step(-1)">◀</div>
+        <div class="stage" id="dlgStage">🌅</div>
+        <div class="nav-arrow next" onclick="step(1)">▶</div>
+      </div>
+      <div class="df">
+        <div class="meta" id="dlgMeta"></div>
+        <div class="acts">
+          <span class="dlg-btn ghost" onclick="closeModal()">✕ 关闭 (Esc)</span>
+          <span class="dlg-btn ok">⬇ 下载原图</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const IMG = [
+    {e:'🌅',c:'peach',n:'海边日落.jpg',s:'2.1MB',d:'08-03',cat:'旅行',m:'2026 年 8 月',mo:'今天 · 上海',ar:1.5,t:'photo'},
+    {e:'🍰',c:'ok',n:'下午茶.jpg',s:'920KB',d:'08-03',cat:'美食',m:'2026 年 8 月',mo:'今天 · 上海',ar:1,t:'photo'},
+    {e:'🐰',c:'purple',n:'小兔.gif',s:'1.1MB',d:'08-03',cat:'宠物',m:'2026 年 8 月',mo:'今天 · 上海',ar:1,t:'gif'},
+    {e:'☕',c:'warn',n:'咖啡.jpg',s:'700KB',d:'08-03',cat:'美食',m:'2026 年 8 月',mo:'今天 · 上海',ar:0.75,t:'photo'},
+    {e:'🌻',c:'warn',n:'向日葵.jpg',s:'780KB',d:'08-02',cat:'风景',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:1.3,t:'photo'},
+    {e:'🏯',c:'peach',n:'古街.png',s:'3.3MB',d:'08-02',cat:'风景',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:0.75,t:'photo'},
+    {e:'🎈',c:'danger',n:'派对.jpg',s:'1.5MB',d:'08-02',cat:'日常',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:1,t:'photo'},
+    {e:'🎬',c:'main',n:'海边vlog.mp4',s:'18.4MB',d:'08-02',cat:'旅行',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:1.78,t:'video'},
+    {e:'🍜',c:'ok',n:'拉面.jpg',s:'1.4MB',d:'08-01',cat:'美食',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:1.33,t:'photo'},
+    {e:'🌃',c:'main',n:'夜景.png',s:'4.4MB',d:'08-01',cat:'风景',m:'2026 年 8 月',mo:'昨天 · 杭州',ar:1.6,t:'photo'},
+    {e:'🍦',c:'danger',n:'冰激凌.png',s:'880KB',d:'07-25',cat:'美食',m:'2026 年 7 月',mo:'7 月 25 日 · 杭州',ar:0.8,t:'photo'},
+    {e:'🌸',c:'danger',n:'樱花.jpg',s:'1.8MB',d:'07-25',cat:'风景',m:'2026 年 7 月',mo:'7 月 25 日 · 杭州',ar:0.66,t:'photo'},
+    {e:'🏞',c:'ok',n:'湖光.png',s:'3.0MB',d:'07-25',cat:'风景',m:'2026 年 7 月',mo:'7 月 25 日 · 杭州',ar:1.5,t:'photo'},
+    {e:'🐢',c:'main',n:'小乌龟.jpg',s:'620KB',d:'07-18',cat:'宠物',m:'2026 年 7 月',mo:'7 月 18 日 · 苏州',ar:1,t:'photo'},
+    {e:'🚣',c:'purple',n:'划船.jpg',s:'2.0MB',d:'07-18',cat:'旅行',m:'2026 年 7 月',mo:'7 月 18 日 · 苏州',ar:1.33,t:'photo'},
+    {e:'🐕',c:'peach',n:'修勾.jpg',s:'1.3MB',d:'07-18',cat:'宠物',m:'2026 年 7 月',mo:'7 月 18 日 · 苏州',ar:1,t:'photo'},
+    {e:'🌈',c:'main',n:'彩虹.jpg',s:'2.8MB',d:'07-18',cat:'风景',m:'2026 年 7 月',mo:'7 月 18 日 · 苏州',ar:1.78,t:'photo'},
+    {e:'🎐',c:'purple',n:'风铃.jpg',s:'1.0MB',d:'07-18',cat:'日常',m:'2026 年 7 月',mo:'7 月 18 日 · 苏州',ar:0.75,t:'photo'},
+  ];
+
+  const CATS = [{name:'全部', color:null}, {name:'旅行', color:'#FFD6A5'}, {name:'美食', color:'#CAFFBF'}, {name:'宠物', color:'#BDB2FF'}, {name:'风景', color:'#FFADAD'}, {name:'日常', color:'#A0C4FF'}];
+  let curView = 'hybrid'; let curCat = '全部'; let curIdx = 0;
+
+  const badge = t => t==='video' ? '<span class="badge video" style="top:6px;left:6px">🎬 VIDEO</span>' : t==='gif' ? '<span class="badge gif" style="top:6px;left:6px">✨ GIF</span>' : '';
+
+  function renderChips(){
+    document.getElementById('chipRow').innerHTML = CATS.map(c=>{
+      const n = c.name==='全部' ? IMG.length : IMG.filter(i=>i.cat===c.name).length;
+      const dot = c.color ? `<span class="dot" style="background:${c.color}"></span>` : '⭐ ';
+      return `<span class="chip ${c.name===curCat?'on':''}" onclick="setCat('${c.name}')">${dot}${c.name} <i>${n}</i></span>`;
+    }).join('');
+  }
+  function setCat(name){ curCat=name; renderChips(); render(curView); }
+  function filtered(){ return curCat==='全部' ? IMG : IMG.filter(i=>i.cat===curCat); }
+
+  // 时间线
+  function renderTimeline(){
+    const list = filtered();
+    const months = [...new Set(list.map(i=>i.m))];
+    let html = '';
+    months.forEach(m=>{
+      const items = list.filter(i=>i.m===m);
+      html += `<div class="date-pill">📅 ${m} <span class="sub">· ${items.length} 张</span></div>`;
+      for(let i=0;i<items.length;i+=5){ const row=items.slice(i,i+5); html+='<div class="jrow">'; row.forEach(it=>{ const idx=IMG.indexOf(it); html+=`<div class="jitem t-${it.c}" style="--ar:${it.ar}" onclick="openPreview(${idx})">${it.e}${badge(it.t)}<div class="cap">${it.n}</div></div>`; }); html+='</div>'; }
+    });
+    document.getElementById('pane-timeline').innerHTML = html || empty();
+  }
+
+  // 瀑布流
+  function renderMasonry(){
+    const list = filtered();
+    const html = '<div class="masonry">' + list.map(it=>{ const idx=IMG.indexOf(it); return `<div class="mcard" onclick="openPreview(${idx})"><div class="thumb t-${it.c}" style="aspect-ratio:${it.ar}/1">${it.e}${badge(it.t)}</div><div class="info"><div class="name">${it.n}</div><div class="meta">📷 ${it.s} · ${it.d}</div></div></div>`; }).join('') + '</div>';
+    document.getElementById('pane-masonry').innerHTML = list.length ? html : empty();
+  }
+
+  // 时刻多选
+  function renderMoments(){
+    const list = filtered();
+    const mos = [...new Set(list.map(i=>i.mo))];
+    let html = '';
+    mos.forEach(mo=>{
+      const items = list.filter(i=>i.mo===mo);
+      html += `<div class="group-title"><h3>📅 ${mo}</h3><span class="sub">· ${items.length} 张</span></div><div class="mogrid">`;
+      items.forEach(it=>{ const idx=IMG.indexOf(it); html+=`<div class="mocard t-${it.c}" data-idx="${idx}" onclick="openPreview(${idx})">${it.e}${badge(it.t)}<span class="check" onclick="event.stopPropagation();toggleCheck(this.parentElement)">✓</span></div>`; });
+      html += '</div>';
+    });
+    document.getElementById('pane-moments').innerHTML = html || empty();
+    updateSel();
+  }
+
+  // 新：混合视图（按天分栏 + 小网格 + hover 文件名 + 多选）
+  function renderHybrid(){
+    const list = filtered();
+    const days = [...new Set(list.map(i=>i.d))].sort((a,b)=>b.localeCompare(a));
+    let html = '<div class="hybrid">';
+    days.forEach(d=>{
+      const items = list.filter(i=>i.d===d);
+      const mo = items[0].mo;
+      html += `<div class="hybrid-row">
+        <div class="day-col"><div class="day-num">${d.slice(3)}</div><div class="day-meta">${mo.split(' · ')[0]}<br>${mo.split(' · ')[1]||''}</div></div>
+        <div class="day-content"><div class="hgrid">`;
+      items.forEach(it=>{ const idx=IMG.indexOf(it); html+=`<div class="hcard t-${it.c}" data-idx="${idx}" onclick="openPreview(${idx})">${it.e}${badge(it.t)}<span class="check" onclick="event.stopPropagation();toggleCheck(this.parentElement)">✓</span><div class="cap">${it.n}</div></div>`; });
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    document.getElementById('pane-hybrid').innerHTML = html || empty();
+    updateSel();
+  }
+
+  function toggleCheck(el){ el.classList.toggle('sel'); updateSel(); }
+  function updateSel(){
+    const n = document.querySelectorAll('.mocard.sel, .hcard.sel').length;
+    document.getElementById('selCount').textContent = n;
+    document.getElementById('selbar').classList.toggle('show', n>0);
+  }
+  function empty(){ return `<div style="text-align:center;padding:60px 20px;color:var(--ink-soft);font-weight:800">🔍 这个分类下还没有图片哦</div>`; }
+
+  function switchView(v){
+    curView = v;
+    document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+    document.getElementById('pane-'+v).classList.add('on');
+    document.getElementById('selbar').classList.remove('show');
+    render(v);
+  }
+  function render(v){
+    if(v==='timeline') renderTimeline();
+    else if(v==='masonry') renderMasonry();
+    else if(v==='moments') renderMoments();
+    else renderHybrid();
+  }
+
+  function openPreview(idx){ curIdx=idx; fillDialog(); document.getElementById('modal').classList.add('show'); }
+  function fillDialog(){
+    const it=IMG[curIdx];
+    document.getElementById('dlgName').textContent=it.n;
+    document.getElementById('dlgPos').textContent=(curIdx+1)+' / '+IMG.length;
+    const stage=document.getElementById('dlgStage'); stage.className='stage t-'+it.c; stage.textContent=it.e;
+    document.getElementById('dlgMeta').innerHTML=`<span>🏷️ ${it.cat}</span><span>📷 ${it.s}</span><span>📅 ${it.d}</span>`+(it.t==='video'?'<span>🎬 视频</span>':it.t==='gif'?'<span>✨ 动图</span>':'');
+  }
+  function step(d){ curIdx=(curIdx+d+IMG.length)%IMG.length; fillDialog(); }
+  function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+  document.querySelectorAll('.view-switch button').forEach(b=>{ b.addEventListener('click', ()=>switchView(b.dataset.v)); });
+  document.addEventListener('keydown', e=>{ const m=document.getElementById('modal'); if(!m.classList.contains('show')) return; if(e.key==='Escape') closeModal(); if(e.key==='ArrowLeft') step(-1); if(e.key==='ArrowRight') step(1); });
+
+  renderChips();
+  renderHybrid();
+</script>
+</body>
+</html>
