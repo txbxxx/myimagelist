@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>糖果图库 · 卡通 Angular 风格原型</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* 3 主色 + 1 深文字色（深色是棕色的延伸） */
+      --cream: #FFF9E6;
+      --white: #FFFFFF;
+      --accent: #FFADAD;
+      --brown: #4A3B32;
+      --ink: #2E2019;
+
+      --radius: 6px;          /* 小圆角 */
+      --radius-sm: 3px;
+      --border: 3px solid var(--brown);
+      --border-dashed: 3px dashed var(--brown);
+      --shadow: 5px 5px 0 var(--brown);
+      --shadow-sm: 3px 3px 0 var(--brown);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+      background-color: var(--cream);
+      background-image:
+        radial-gradient(var(--accent) 18%, transparent 19%);
+      background-size: 28px 28px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 50px; }
+
+    /* 统一的卡通描边块 */
+    .block {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    /* Header */
+    .app-header {
+      background: var(--white);
+      border-bottom: var(--border);
+      box-shadow: 0 5px 0 var(--brown);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 14px 0;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 900; font-size: 22px;
+    }
+    .rabbit-box {
+      width: 48px; height: 48px;
+      background: var(--accent);
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      display: grid; place-items: center;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .rabbit-box::before, .rabbit-box::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      width: 12px; height: 22px;
+      background: var(--accent);
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      z-index: -1;
+    }
+    .rabbit-box::before { left: 8px; transform: rotate(-10deg); }
+    .rabbit-box::after { right: 8px; transform: rotate(10deg); }
+    .rabbit-box .face { font-size: 26px; }
+
+    .nav { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* 按钮：方角 + 粗描边 + 偏移阴影 */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 22px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 900; font-size: 15px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform .12s, box-shadow .12s;
+    }
+    .btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--brown); }
+    .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--brown); }
+    .btn.primary { background: var(--accent); }
+
+    /* 页面标题区 */
+    .page-head {
+      padding: 32px 0 18px;
+      display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+    }
+    .page-head h1 { margin: 0; font-size: 30px; }
+    .page-head p { margin: 0; color: #6b5b4f; font-weight: 700; }
+    .sticker-title {
+      display: inline-block;
+      background: var(--accent);
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 18px;
+      box-shadow: var(--shadow-sm);
+      transform: rotate(-1.5deg);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 22px;
+    }
+    .tag {
+      padding: 7px 16px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-weight: 900; font-size: 14px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform .12s;
+    }
+    .tag:hover { transform: translate(-1px,-1px); }
+    .tag.active { background: var(--accent); }
+    .spacer { flex: 1; min-width: 12px; }
+    .search {
+      padding: 10px 16px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-weight: 800; font-size: 14px;
+      box-shadow: var(--shadow-sm);
+      min-width: 220px;
+    }
+
+    /* 小装饰：胶带 */
+    .tape {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 70px; height: 22px;
+      background: rgba(255,173,173,.55);
+      border-left: 2px solid rgba(74,59,50,.25);
+      border-right: 2px solid rgba(74,59,50,.25);
+    }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .card {
+      position: relative;
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .card:hover { transform: translate(-3px,-3px) rotate(-0.5deg); box-shadow: 8px 8px 0 var(--brown); }
+    .card-thumb {
+      height: 150px;
+      background: var(--cream);
+      border-bottom: var(--border-dashed);
+      display: grid; place-items: center;
+      font-size: 64px;
+    }
+    .card-body { padding: 14px; }
+    .card-title { font-weight: 900; font-size: 15px; margin-bottom: 8px; }
+    .card-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      padding: 4px 10px;
+      border: 2px solid var(--brown);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 12px; font-weight: 900;
+    }
+    .card-actions {
+      display: flex; gap: 8px;
+      padding: 0 14px 14px;
+    }
+    .icon-btn {
+      width: 34px; height: 34px;
+      border: 2.5px solid var(--brown);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      display: grid; place-items: center;
+      font-size: 15px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform .12s;
+    }
+    .icon-btn:hover { transform: translate(-1px,-1px); }
+    .icon-btn.danger { background: var(--accent); }
+
+    /* 上传区 */
+    .upload-zone {
+      position: relative;
+      border: var(--border-dashed);
+      border-radius: var(--radius);
+      background: var(--white);
+      padding: 55px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+    .upload-zone .icon { font-size: 56px; margin-bottom: 12px; }
+    .upload-zone p { margin: 6px 0; font-weight: 900; }
+    .upload-zone .hint { font-size: 13px; color: #6b5b4f; font-weight: 700; }
+    .upload-zone .arrow {
+      position: absolute;
+      right: 24px; bottom: -18px;
+      font-size: 40px;
+      transform: rotate(-15deg);
+      text-shadow: 2px 2px 0 var(--brown);
+    }
+    .upload-zone.dragover {
+      border-style: solid;
+      background: var(--accent);
+    }
+
+    /* 登录 */
+    .login-card {
+      max-width: 440px; margin: 40px auto;
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -14px; right: 30px;
+      width: 50px; height: 26px;
+      background: rgba(255,173,173,.55);
+      border-left: 2px solid rgba(74,59,50,.25);
+      border-right: 2px solid rgba(74,59,50,.25);
+      transform: rotate(3deg);
+    }
+    .login-head {
+      padding: 18px;
+      border-bottom: var(--border);
+      background: var(--accent);
+      font-weight: 900; font-size: 20px;
+      text-align: center;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .login-body { padding: 24px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-weight: 900; margin-bottom: 6px; }
+    .field input {
+      width: 100%; padding: 12px 14px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      font-weight: 800; font-size: 15px;
+      box-shadow: 3px 3px 0 var(--brown) inset;
+    }
+    .login-footer { padding: 0 24px 24px; }
+    .text-btn {
+      background: none; border: none;
+      color: var(--brown); font-weight: 900;
+      text-decoration: underline; cursor: pointer;
+      padding: 0;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(46,32,25,.55);
+      display: grid; place-items: center;
+      padding: 20px; z-index: 100;
+    }
+    .modal {
+      width: 100%; max-width: 720px;
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: 8px 8px 0 var(--brown);
+      position: relative;
+    }
+    .modal::after {
+      content: '';
+      position: absolute;
+      top: -12px; left: 30px;
+      width: 60px; height: 24px;
+      background: rgba(255,173,173,.55);
+      border-left: 2px solid rgba(74,59,50,.25);
+      border-right: 2px solid rgba(74,59,50,.25);
+      transform: rotate(-3deg);
+    }
+    .modal-head {
+      padding: 16px 20px;
+      border-bottom: var(--border);
+      background: var(--accent);
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 900; font-size: 18px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .modal-close {
+      width: 34px; height: 34px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      display: grid; place-items: center;
+      font-weight: 900; font-size: 22px; cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .modal-body {
+      padding: 30px; min-height: 320px;
+      display: grid; place-items: center;
+      font-size: 90px;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          var(--cream),
+          var(--cream) 12px,
+          transparent 12px,
+          transparent 24px
+        );
+    }
+    .modal-foot {
+      padding: 14px 20px;
+      border-top: var(--border-dashed);
+      display: flex; gap: 10px; justify-content: flex-end;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-size: 20px; font-weight: 900;
+      margin: 40px 0 18px;
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent);
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      box-shadow: var(--shadow-sm);
+      transform: rotate(-1deg);
+    }
+
+    /* 色板条 */
+    .palette-bar {
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin: 24px 0;
+    }
+    .swatch { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+    .swatch-color {
+      width: 42px; height: 42px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 640px) {
+      .header-inner { justify-content: center; }
+      .gallery { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .card-thumb { height: 120px; font-size: 48px; }
+      .page-head h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="rabbit-box">
+          <span class="face">🐰</span>
+        </div>
+        <span>糖果图库</span>
+      </div>
+      <nav class="nav">
+        <button class="btn primary">画廊</button>
+        <button class="btn">上传</button>
+        <button class="btn">分类</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="palette-bar">
+      <div class="swatch"><div class="swatch-color" style="background:#FFF9E6"></div> 奶油底</div>
+      <div class="swatch"><div class="swatch-color" style="background:#FFFFFF"></div> 卡片白</div>
+      <div class="swatch"><div class="swatch-color" style="background:#FFADAD"></div> 点缀粉</div>
+      <div class="swatch"><div class="swatch-color" style="background:#4A3B32"></div> 咖啡描边</div>
+      <span style="flex:1"></span>
+      <strong>0 渐变 · 小圆角 · 贴纸感</strong>
+    </div>
+
+    <div class="page-head">
+      <div class="sticker-title">
+        <h1 style="margin:0;font-size:28px;">我的糖果图库</h1>
+      </div>
+      <p>共 12 张图片 · 旅行、美食、宠物 3 个分类</p>
+    </div>
+
+    <div class="toolbar">
+      <span class="tag active">全部</span>
+      <span class="tag">旅行</span>
+      <span class="tag">美食</span>
+      <span class="tag">宠物</span>
+      <span class="tag">截图</span>
+      <span class="spacer"></span>
+      <input class="search" placeholder="🔍 搜索图片名称" />
+      <button class="btn primary">+ 上传</button>
+    </div>
+
+    <section>
+      <div class="gallery">
+        <div class="card">
+          <div class="tape"></div>
+          <div class="card-thumb">🏔️</div>
+          <div class="card-body">
+            <div class="card-title">mountain.jpg</div>
+            <div class="card-meta">
+              <span class="badge">旅行</span>
+              <span class="badge">2.4 MB</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn">⬇️</button>
+            <button class="icon-btn">✏️</button>
+            <button class="icon-btn danger">🗑️</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tape"></div>
+          <div class="card-thumb">🍰</div>
+          <div class="card-body">
+            <div class="card-title">cake.jpg</div>
+            <div class="card-meta">
+              <span class="badge">美食</span>
+              <span class="badge">1.1 MB</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn">⬇️</button>
+            <button class="icon-btn">✏️</button>
+            <button class="icon-btn danger">🗑️</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tape"></div>
+          <div class="card-thumb">🐱</div>
+          <div class="card-body">
+            <div class="card-title">cat.png</div>
+            <div class="card-meta">
+              <span class="badge">宠物</span>
+              <span class="badge">3.2 MB</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn">⬇️</button>
+            <button class="icon-btn">✏️</button>
+            <button class="icon-btn danger">🗑️</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tape"></div>
+          <div class="card-thumb">🌸</div>
+          <div class="card-body">
+            <div class="card-title">sakura.jpg</div>
+            <div class="card-meta">
+              <span class="badge">旅行</span>
+              <span class="badge">1.8 MB</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn">⬇️</button>
+            <button class="icon-btn">✏️</button>
+            <button class="icon-btn danger">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="section-title">📤 上传页</h2>
+    <div class="upload-zone">
+      <div class="arrow">⬇️</div>
+      <div class="icon">📦</div>
+      <p>把图片拖到这里，或者点击上传</p>
+      <p class="hint">支持 JPG / PNG / GIF / WEBP</p>
+    </div>
+
+    <h2 class="section-title">🔐 登录页</h2>
+    <div class="login-card">
+      <div class="login-head">欢迎回到糖果图库 🍬</div>
+      <div class="login-body">
+        <div class="field">
+          <label>用户名</label>
+          <input placeholder="请输入用户名" />
+        </div>
+        <div class="field">
+          <label>密码</label>
+          <input type="password" placeholder="请输入密码" />
+        </div>
+      </div>
+      <div class="login-footer">
+        <button class="btn primary" style="width:100%;justify-content:center;margin-bottom:12px;">登录</button>
+        <div style="text-align:center;">
+          还没有账号？ <button class="text-btn">注册一个</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">🔍 预览弹窗</h2>
+    <div style="position:relative;height:420px;">
+      <div class="modal-backdrop">
+        <div class="modal">
+          <div class="modal-head">
+            <span>预览图片</span>
+            <button class="modal-close">×</button>
+          </div>
+          <div class="modal-body">🏔️</div>
+          <div class="modal-foot">
+            <button class="btn">下载</button>
+            <button class="btn">重命名</button>
+            <button class="btn primary">关闭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
