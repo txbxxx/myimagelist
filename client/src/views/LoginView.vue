@@ -28,7 +28,7 @@
           <el-input
             v-model="password"
             type="password"
-            placeholder="至少 6 位"
+            :placeholder="isLogin ? '请输入密码' : '至少 8 位，含字母和数字'"
             maxlength="64"
             show-password
             size="large"
@@ -74,7 +74,7 @@
 
       <div class="tip-box">
         <el-icon class="tip-icon"><InfoFilled /></el-icon>
-        <span>密码用 bcrypt 加密存储，token 默认 7 天有效。{{ isLogin ? '' : '忘记密码暂不支持找回哦～' }}</span>
+        <span>密码用 bcrypt 加密存储，token 默认 2 天有效。{{ isLogin ? '' : '忘记密码暂不支持找回哦～' }}</span>
       </div>
     </div>
   </div>
@@ -122,8 +122,13 @@ async function onSubmit() {
     ElMessage.warning('用户名只能是 2-20 位字母/数字/下划线/中文');
     return;
   }
-  if (password.value.length < 6) {
-    ElMessage.warning('密码至少 6 位');
+  if (!password.value) {
+    ElMessage.warning('请输入密码');
+    return;
+  }
+  // 密码强度只在注册时把关；登录不校验，否则规则升级前的老账号会被挡住登不上
+  if (!isLogin.value && (password.value.length < 8 || !/(?=.*[a-zA-Z])(?=.*\d)/.test(password.value))) {
+    ElMessage.warning('密码至少 8 位，需含字母和数字');
     return;
   }
   if (!isLogin.value && password.value !== confirmPassword.value) {
