@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>糖果图库 · 3~4 色精简版对比</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* 共享 token */
+      --brown: #4A3B32;
+      --brown-deep: #2E2019;
+      --cream: #FFF9E6;
+      --white: #FFFFFF;
+      --radius: 18px;
+      --shadow: 4px 4px 0 var(--brown);
+
+      /* 改后只用一种点缀色 */
+      --accent: #FFADAD;
+      --accent-dark: #E58A8A;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito', 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+      background: #FDF8F0;
+      color: var(--brown-deep);
+      line-height: 1.6;
+    }
+
+    .page-title {
+      text-align: center;
+      padding: 32px 20px 10px;
+      font-size: 26px;
+      font-weight: 900;
+    }
+    .page-sub {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 28px;
+      color: #6b5b4f;
+      font-size: 15px;
+    }
+
+    .switcher {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      padding: 10px 20px;
+      border: 3px solid var(--brown);
+      border-radius: 999px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .15s;
+    }
+    .chip:hover { transform: translate(-2px,-2px); }
+    .chip.active { background: var(--accent); }
+
+    .stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+    @media (max-width: 1100px) {
+      .stage { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      border: 3px solid var(--brown);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 14px 18px;
+      border-bottom: 3px solid var(--brown);
+      font-weight: 900;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--brown); }
+
+    /* ================= 改前：多彩渐变 ================= */
+    .before-demo {
+      --c-bg: #FFF9E6;
+      --c-pink: #FFADAD;
+      --c-blue: #A0C4FF;
+      --c-mint: #CAFFBF;
+      --c-yellow: #FDFFB6;
+      --c-purple: #BDB2FF;
+      --c-peach: #FFD6A5;
+      background:
+        radial-gradient(circle at 20px 30px, rgba(255,214,165,.35) 8px, transparent 9px),
+        radial-gradient(circle at 80px 120px, rgba(160,196,255,.30) 10px, transparent 11px),
+        radial-gradient(circle at 200px 60px, rgba(202,255,191,.30) 6px, transparent 7px),
+        radial-gradient(circle at 300px 200px, rgba(255,173,173,.28) 9px, transparent 10px);
+      background-color: var(--c-bg);
+      background-size: 400px 300px;
+      min-height: 560px;
+      padding: 18px;
+    }
+
+    .before-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, #FFFBE6 0%, #FFF0F5 100%);
+      border: 3px solid var(--brown);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .before-header .logo { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+    .before-header .rabbit {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #FFF6BD, #FFE0EC);
+      border: 3px solid var(--brown);
+      display: grid; place-items: center; font-size: 20px;
+    }
+    .before-header nav { display: flex; gap: 10px; }
+    .before-btn {
+      padding: 8px 18px; border: 3px solid var(--brown); border-radius: 999px;
+      font-weight: 800; box-shadow: 3px 3px 0 var(--brown); cursor: pointer;
+      background: linear-gradient(180deg, #FFF6BD 0%, #FDFFB6 100%);
+    }
+    .before-btn.primary { background: linear-gradient(180deg, #B5E2FF, #A0C4FF); }
+    .before-btn.success { background: linear-gradient(180deg, #D4FFC2, #CAFFBF); }
+
+    .before-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .before-tag {
+      padding: 6px 14px; border: 2.5px solid var(--brown); border-radius: 999px;
+      font-weight: 800; font-size: 13px; box-shadow: 2px 2px 0 var(--brown);
+    }
+    .before-tag:nth-child(1){ background: var(--c-pink); }
+    .before-tag:nth-child(2){ background: var(--c-blue); }
+    .before-tag:nth-child(3){ background: var(--c-mint); }
+    .before-tag:nth-child(4){ background: var(--c-yellow); }
+    .before-tag:nth-child(5){ background: var(--c-purple); }
+
+    .before-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .before-card {
+      background: #fff; border: 3px solid var(--brown); border-radius: 16px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .before-card .thumb {
+      height: 110px;
+      background: linear-gradient(135deg, #FFF6BD, #FFE0EC);
+      display: grid; place-items: center; font-size: 44px;
+    }
+    .before-card .info { padding: 10px 12px; }
+    .before-card .title { font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+    .before-card .meta {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .before-card .badge {
+      font-size: 11px; padding: 3px 8px; border-radius: 999px;
+      border: 2px solid var(--brown); font-weight: 800;
+    }
+    .before-card .badge.pink { background: var(--c-pink); }
+    .before-card .badge.blue { background: var(--c-blue); }
+    .before-card .badge.mint { background: var(--c-mint); }
+
+    /* ================= 改后：3~4 色扁平 ================= */
+    .after-demo {
+      background: var(--cream);
+      min-height: 560px;
+      padding: 18px;
+    }
+
+    .after-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--white);
+      border: 3px solid var(--brown);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .after-header .logo { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+    .after-header .rabbit {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--brown);
+      display: grid; place-items: center; font-size: 20px;
+    }
+    .after-header nav { display: flex; gap: 10px; }
+    .after-btn {
+      padding: 8px 18px; border: 3px solid var(--brown); border-radius: 999px;
+      font-weight: 800; box-shadow: 3px 3px 0 var(--brown); cursor: pointer;
+      background: var(--white);
+    }
+    .after-btn.primary { background: var(--accent); }
+
+    .after-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .after-tag {
+      padding: 6px 14px; border: 2.5px solid var(--brown); border-radius: 999px;
+      font-weight: 800; font-size: 13px; box-shadow: 2px 2px 0 var(--brown);
+      background: var(--white);
+    }
+    .after-tag.active { background: var(--accent); }
+
+    .after-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .after-card {
+      background: var(--white); border: 3px solid var(--brown); border-radius: 16px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .after-card .thumb {
+      height: 110px;
+      background: var(--cream);
+      display: grid; place-items: center; font-size: 44px;
+    }
+    .after-card .info { padding: 10px 12px; }
+    .after-card .title { font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+    .after-card .meta { display: flex; gap: 6px; flex-wrap: wrap; }
+    .after-card .badge {
+      font-size: 11px; padding: 3px 8px; border-radius: 999px;
+      border: 2px solid var(--brown); font-weight: 800;
+      background: var(--white);
+    }
+
+    /* 说明区域 */
+    .legend {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .legend-card {
+      border: 3px solid var(--brown);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .legend-card h3 { margin: 0 0 10px; font-size: 17px; }
+    .legend-card ul { margin: 0; padding-left: 18px; }
+    .legend-card li { margin-bottom: 6px; }
+
+    .palette-row {
+      display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .swatch {
+      width: 48px; height: 48px; border-radius: 12px;
+      border: 3px solid var(--brown); box-shadow: 2px 2px 0 var(--brown);
+    }
+
+    .tag-count {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      border: 2px solid var(--brown);
+      font-weight: 800;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">🍬 糖果图库 · 配色精简对比</h1>
+  <p class="page-sub">
+    当前页面使用了大量糖果渐变与多色标签。下面给出「3~4 色扁平版」方案：保留卡通描边和圆角，只保留奶油底、咖啡描边、粉点缀、白卡片四种核心色。
+  </p>
+
+  <div class="switcher">
+    <button class="chip active" onclick="showBoth()">左右对照</button>
+    <button class="chip" onclick="showBefore()">只看改前</button>
+    <button class="chip" onclick="showAfter()">只看改后</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <!-- 改前 -->
+    <div class="panel" id="beforePanel">
+      <div class="panel-head" style="background: linear-gradient(180deg, #FFF0F5, #FFD6E8);">
+        <span class="dot" style="background: #FFADAD;"></span>
+        改前 · 多彩渐变版
+      </div>
+      <div class="before-demo">
+        <div class="before-header">
+          <div class="logo">
+            <div class="rabbit">🐰</div>
+            <span>糖果图库</span>
+          </div>
+          <nav>
+            <button class="before-btn primary">画廊</button>
+            <button class="before-btn">上传</button>
+            <button class="before-btn success">分类</button>
+          </nav>
+        </div>
+
+        <div class="before-toolbar">
+          <span class="before-tag">全部</span>
+          <span class="before-tag">旅行</span>
+          <span class="before-tag">美食</span>
+          <span class="before-tag">截图</span>
+          <span class="before-tag">宠物</span>
+        </div>
+
+        <div class="before-grid">
+          <div class="before-card">
+            <div class="thumb">🏔️</div>
+            <div class="info">
+              <div class="title">mountain.jpg</div>
+              <div class="meta">
+                <span class="badge blue">旅行</span>
+                <span class="badge mint">2.4 MB</span>
+              </div>
+            </div>
+          </div>
+          <div class="before-card">
+            <div class="thumb">🍰</div>
+            <div class="info">
+              <div class="title">cake.jpg</div>
+              <div class="meta">
+                <span class="badge pink">美食</span>
+                <span class="badge mint">1.1 MB</span>
+              </div>
+            </div>
+          </div>
+          <div class="before-card">
+            <div class="thumb">🐱</div>
+            <div class="info">
+              <div class="title">cat.png</div>
+              <div class="meta">
+                <span class="badge pink">宠物</span>
+                <span class="badge blue">3.2 MB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 改后 -->
+    <div class="panel" id="afterPanel">
+      <div class="panel-head" style="background: var(--accent);">
+        <span class="dot" style="background: var(--cream);"></span>
+        改后 · 3~4 色扁平版
+      </div>
+      <div class="after-demo">
+        <div class="after-header">
+          <div class="logo">
+            <div class="rabbit">🐰</div>
+            <span>糖果图库</span>
+          </div>
+          <nav>
+            <button class="after-btn primary">画廊</button>
+            <button class="after-btn">上传</button>
+            <button class="after-btn">分类</button>
+          </nav>
+        </div>
+
+        <div class="after-toolbar">
+          <span class="after-tag active">全部</span>
+          <span class="after-tag">旅行</span>
+          <span class="after-tag">美食</span>
+          <span class="after-tag">截图</span>
+          <span class="after-tag">宠物</span>
+        </div>
+
+        <div class="after-grid">
+          <div class="after-card">
+            <div class="thumb">🏔️</div>
+            <div class="info">
+              <div class="title">mountain.jpg</div>
+              <div class="meta">
+                <span class="badge">旅行</span>
+                <span class="badge">2.4 MB</span>
+              </div>
+            </div>
+          </div>
+          <div class="after-card">
+            <div class="thumb">🍰</div>
+            <div class="info">
+              <div class="title">cake.jpg</div>
+              <div class="meta">
+                <span class="badge">美食</span>
+                <span class="badge">1.1 MB</span>
+              </div>
+            </div>
+          </div>
+          <div class="after-card">
+            <div class="thumb">🐱</div>
+            <div class="info">
+              <div class="title">cat.png</div>
+              <div class="meta">
+                <span class="badge">宠物</span>
+                <span class="badge">3.2 MB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-card">
+      <h3>🎨 改后精简色板 <span class="tag-count">4 色</span></h3>
+      <div class="palette-row">
+        <div class="swatch" style="background: #FFF9E6;" title="奶油底 #FFF9E6"></div>
+        <div class="swatch" style="background: #FFFFFF;" title="卡片白 #FFFFFF"></div>
+        <div class="swatch" style="background: #FFADAD;" title="点缀粉 #FFADAD"></div>
+        <div class="swatch" style="background: #4A3B32;" title="描边/文字 #4A3B32"></div>
+      </div>
+      <ul>
+        <li>去掉所有 <code>linear-gradient</code>，按钮、头部、上传区全部用纯色。</li>
+        <li>分类标签不再「一个分类一个色」，统一用白底描边，当前选中才变粉。</li>
+        <li>背景图案也去掉四色散点，改用纯色奶油底。</li>
+      </ul>
+    </div>
+
+    <div class="legend-card">
+      <h3>📊 当前颜色统计</h3>
+      <ul>
+        <li>CSS 变量中定义了 <strong>11 种糖果色</strong> + 3 种棕/白/墨。</li>
+        <li>代码中实际出现约 <strong>30+ 个不同色值</strong>（含半透明、渐变插值）。</li>
+        <li>按钮、头部、卡片、上传区、进度条、弹窗头部大量渐变。</li>
+        <li>背景有 4 层径向渐变装饰点，视觉上最显「花」。</li>
+      </ul>
+    </div>
+
+    <div class="legend-card">
+      <h3>✅ 这样改的好处</h3>
+      <ul>
+        <li><strong>更干净：</strong>页面第一眼不会到处跳色，图片内容本身更突出。</li>
+        <li><strong>更高级：</strong>少色 + 粗描边反而更有「贴纸感」，不会廉价。</li>
+        <li><strong>更好维护：</strong>新增组件不用纠结配哪个糖果色。</li>
+        <li><strong>更易访问：</strong>颜色语义清晰：粉 = 主要操作/选中，棕 = 结构和文字。</li>
+      </ul>
+    </div>
+
+    <div class="legend-card">
+      <h3>⚠️ 需要注意</h3>
+      <ul>
+        <li>分类管理里的色板选择器（8 色）可以保留——那是用户自定义分类颜色的功能，不是界面主色。</li>
+        <li>状态色（成功/失败/警告提示）如果强制只剩 4 色，可能会降低辨识度，建议用图标 + 文案弥补。</li>
+        <li>如果担心太单调，可在<strong>插画、空状态、emoji</strong>上保留多彩，界面本身保持克制。</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const beforePanel = document.getElementById('beforePanel');
+    const afterPanel = document.getElementById('afterPanel');
+    const chips = document.querySelectorAll('.chip');
+
+    function setActive(idx) {
+      chips.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    function showBoth() {
+      stage.style.gridTemplateColumns = '1fr 1fr';
+      beforePanel.style.display = 'block';
+      afterPanel.style.display = 'block';
+      setActive(0);
+    }
+    function showBefore() {
+      stage.style.gridTemplateColumns = '1fr';
+      beforePanel.style.display = 'block';
+      afterPanel.style.display = 'none';
+      setActive(1);
+    }
+    function showAfter() {
+      stage.style.gridTemplateColumns = '1fr';
+      beforePanel.style.display = 'none';
+      afterPanel.style.display = 'block';
+      setActive(2);
+    }
+  </script>
+</body>
+</html>
