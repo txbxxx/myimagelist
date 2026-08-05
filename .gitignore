@@ -6,3 +6,5 @@ client/dist/
 *.log
 .vscode/
 .idea/
+.env
+!.env.example
