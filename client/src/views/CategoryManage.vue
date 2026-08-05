@@ -101,13 +101,17 @@
               @keyup.enter="saveEdit(cat)"
               @keyup.esc="cancelEdit"
             />
-            <div class="edit-colors">
+            <div class="edit-colors" role="radiogroup" aria-label="编辑分类颜色">
               <button
                 v-for="c in palette"
                 :key="c"
+                type="button"
                 class="color-dot small"
                 :class="{ active: editColor === c }"
                 :style="{ background: c }"
+                :aria-label="`颜色 ${c}（${contrastLabel(c)}）`"
+                :aria-checked="editColor === c"
+                role="radio"
                 @click="editColor = c"
               ></button>
             </div>

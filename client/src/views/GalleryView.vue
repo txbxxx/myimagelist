@@ -3,7 +3,7 @@
     <!-- 标题区 -->
     <div class="page-title">
       <Icon icon="lucide:rainbow" class="emoji" />
-      <h2>我的糖果图库</h2>
+      <h2>画廊</h2>
       <p>共 <b>{{ store.images.length }}</b> 张图 · 当前展示 <b>{{ store.filteredImages.length }}</b> 张</p>
     </div>
 
@@ -51,7 +51,7 @@
           class="emoji"
         />
         <p v-if="store.currentCategory === 'all'">
-          画廊还是空的～<router-link to="/upload" class="link">去上传第一张图</router-link>吧！
+          还没有图片，<router-link to="/upload" class="link">去上传第一张</router-link>吧 🐰
         </p>
         <p v-else>这个分类下还没有图片哦</p>
       </div>
