@@ -159,9 +159,12 @@ async function handleLogout() {
 }
 .deco .iconify { font-size: 18px; }
 @media (max-width: 600px) {
+  /* 三列 grid：Logo | 导航（占满中段）| 用户，避免 flex 挤换行 */
+  .header-inner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; }
+  .nav { justify-self: end; }
   .logo-text { font-size: 22px; }
   .nav-link { padding: 6px 12px; font-size: 13px; }
   .user-box { padding: 2px 6px 2px 10px; }
-  .user-greeting { font-size: 12px; }
+  .user-greeting { display: none; }   /* 小屏只保留退出按钮，省空间 */
 }
 </style>

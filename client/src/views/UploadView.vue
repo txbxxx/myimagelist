@@ -2,7 +2,7 @@
   <div class="upload-view">
     <div class="page-title">
       <Icon icon="lucide:cloud-upload" class="emoji" />
-      <h2>把图片传上来吧～</h2>
+      <h2>上传图片</h2>
       <p>支持 jpg / png / gif / webp / mp4，可以一次拖好多张</p>
     </div>
 

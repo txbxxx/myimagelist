@@ -5,15 +5,34 @@
  * - 视频上传后异步调 ffmpeg 抽第一帧作缩略图（thumbnail.js）
  * - JWT 鉴权（bcryptjs 加密 + jsonwebtoken）
  */
+
+// 加载 .env（必须在最顶部、其它 require 之前）
+// 路径优先级：
+//   1) 仓库根目录的 .env（dev / docker compose 默认）
+//   2) server/.env（container 内单独 mount 的场景）
+//   3) 当前工作目录下的 .env（兜底，dotenv 默认行为）
+// - 已存在的 process.env 不会被覆盖（override: false），方便 shell export 临时调试
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({
+  path: [
+    path.resolve(__dirname, '../.env'),
+    path.resolve(__dirname, '.env'),
+    path.resolve(process.cwd(), '.env')
+  ],
+  override: false,
+  quiet: true   // 静默：没找到 .env 不打 warn（dev/Docker 都有可能没有）
+});
+
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const multer = require('multer');
 const { nanoid } = require('nanoid');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');  // 签名 URL 用（Node 内置，零依赖）
 const db = require('./db');
 const { createStorage, backendOf } = require('./storage');
 const { probeMedia } = require('./thumbnail');
@@ -26,10 +45,64 @@ const PORT = process.env.PORT || 3000;
 const storage = createStorage();
 
 // JWT 配置
-const JWT_SECRET = process.env.JWT_SECRET || 'candy-gallery-dev-secret-change-me-in-prod';
-const JWT_EXPIRES_IN = '7d';
-if (!process.env.JWT_SECRET) {
-  console.warn('⚠️  未设置环境变量 JWT_SECRET，正在使用默认开发密钥；生产环境务必注入随机 JWT_SECRET，否则 token 可被伪造！');
+// JWT 配置 —— fail-closed：未设 JWT_SECRET 直接拒绝启动（公网私有图库不能赌默认密钥）
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('未设置 JWT_SECRET 环境变量。请生成一个强随机密钥注入，例如：node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+}
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '2d';
+
+// 公开注册开关：默认关闭（私有图库，账号用 _create-user.js 建）。设 REG_OPEN=true 才开放
+const REG_OPEN = process.env.REG_OPEN === 'true';
+
+// CORS：同域部署（vite proxy / nginx）下不生效；前后端跨域时设 CORS_ORIGIN 收紧到前端域名
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '';
+
+// 启动时生成一个假 bcrypt 哈希，用于"用户不存在"时拉平响应时间（防时序侧信道枚举用户名）
+const DUMMY_HASH = bcrypt.hashSync('dummy-not-used', 10);
+
+// ============ 文件签名 URL（替代裸 express.static，让 /uploads 受鉴权）============
+// 原因：<img>/<video> 不能带 Authorization 头，所以把"已验证"的凭证签进 URL，后端验签后下发文件。
+// 机制：HMAC-SHA256 无状态签名，复用 JWT_SECRET，不存 session（重启/多实例都不影响）。
+const SIGNED_URL_TTL = Number(process.env.SIGNED_URL_TTL) || 3600;  // 秒，默认 1 小时
+
+// 签名 URL 独立密钥（职责分离：即使 JWT 密钥泄露，文件 URL 签名仍独立）。未设拒绝启动
+const URL_SIGN_SECRET = process.env.URL_SIGN_SECRET;
+if (!URL_SIGN_SECRET) {
+  throw new Error('未设置 URL_SIGN_SECRET 环境变量（用于签名 /uploads 文件 URL）。生成：node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+}
+
+// 本地存储配额（MB）。仅 STORAGE_TYPE=local 时生效（OSS 弹性容量不限）；0 = 不限
+const UPLOAD_QUOTA_MB = Number(process.env.UPLOAD_QUOTA_MB) || 0;
+
+// 从 /uploads/<key> 里取出 <key>（key 可能含子目录，如 thumbs/xxx.jpg）
+function _extractKey(urlOrPath) {
+  return decodeURIComponent(String(urlOrPath).replace(/^\/uploads\//, ''));
+}
+
+// 给本地文件 url 签名；COS 公网 URL（https://...）不签，走 COS 自己的访问控制
+function signUrlIfNeeded(url) {
+  if (!url || !url.startsWith('/uploads/')) return url;
+  const key = _extractKey(url);
+  const exp = Math.floor(Date.now() / 1000) + SIGNED_URL_TTL;
+  const sig = crypto.createHmac('sha256', URL_SIGN_SECRET).update(`${key}|${exp}`).digest('hex');
+  return `/uploads/${key}?exp=${exp}&sig=${sig}`;
+}
+
+// /uploads 验签中间件：校验签名 + 过期时间；通过才放行到 res.sendFile
+function verifyFileSig(req, res, next) {
+  const key = _extractKey(req.path);
+  const exp = Number(req.query.exp);
+  const sig = req.query.sig;
+  if (!key || !exp || !sig) return res.status(401).end();
+  if (Math.floor(Date.now() / 1000) > exp) return res.status(410).end();  // 过期
+  const expected = crypto.createHmac('sha256', URL_SIGN_SECRET).update(`${key}|${exp}`).digest('hex');
+  const sigBuf = Buffer.from(String(sig));
+  if (sigBuf.length !== expected.length ||
+      !crypto.timingSafeEqual(sigBuf, Buffer.from(expected))) {
+    return res.status(403).end();
+  }
+  next();
 }
 
 // multer 内存存储：接住 buffer，再交给 storage 层（这样 COS/本地走同一份代码）
@@ -51,13 +124,21 @@ const upload = multer({
   }
 });
 
-app.use(cors());
+app.use(cors(CORS_ORIGIN ? { origin: CORS_ORIGIN } : undefined));
 app.use(express.json());
 // 混合存储支持：永远挂载本地静态目录。
 // 即使当前默认是 COS，老的本地文件还得服务（DB 里 storage_type=local 的记录 URL 指向这里）。
 // COS 文件直接走公网 URL，不经过 Node。
 fs.mkdirSync(path.join(__dirname, 'uploads', 'thumbs'), { recursive: true });
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// /uploads 受签名保护（替代裸 express.static）：先验签，通过才下发文件（res.sendFile 支持视频 Range 请求）
+app.get(/^\/uploads\/.+$/, verifyFileSig, (req, res) => {
+  const key = _extractKey(req.path);
+  const target = path.join(__dirname, 'uploads', key);
+  const uploadsRoot = path.join(__dirname, 'uploads');
+  // 防路径穿越：解析后必须落在 uploads 目录内
+  if (!target.startsWith(uploadsRoot + path.sep)) return res.status(403).end();
+  res.sendFile(target);
+});
 
 // ============ 鉴权中间件 ============
 function requireAuth(req, res, next) {
@@ -85,15 +166,20 @@ function signToken(user) {
 
 // ============ 鉴权路由 ============
 app.post('/api/auth/register', async (req, res) => {
+  // 关闭公开注册：私有图库账号由 _create-user.js 建；需要开放时设 REG_OPEN=true
+  if (!REG_OPEN) {
+    return res.status(403).json({ ok: false, error: '注册已关闭，请联系管理员创建账号（server/_create-user.js）' });
+  }
   try {
     const { username, password } = req.body;
-    if (!username || !String(username).trim()) {
-      return res.status(400).json({ ok: false, error: '用户名不能为空' });
+    const name = String(username || '').trim();
+    // 用户名格式校验（与前端一致：2-20 位字母/数字/下划线/中文）
+    if (!/^[a-zA-Z0-9_\\u4e00-\\u9fa5]{2,20}$/.test(name)) {
+      return res.status(400).json({ ok: false, error: '用户名只能是 2-20 位字母/数字/下划线/中文' });
     }
-    if (!password || password.length < 6) {
-      return res.status(400).json({ ok: false, error: '密码至少 6 位' });
+    if (!password || password.length < 8 || !/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+      return res.status(400).json({ ok: false, error: '密码至少 8 位，需含字母和数字' });
     }
-    const name = String(username).trim();
     const passwordHash = await bcrypt.hash(password, 10);
     let user;
     try {
@@ -108,7 +194,7 @@ app.post('/api/auth/register', async (req, res) => {
     res.json({ ok: true, token, user });
   } catch (err) {
     console.error('[POST /api/auth/register]', err);
-    res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: '服务器内部错误' });
   }
 });
 
@@ -119,9 +205,12 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ ok: false, error: '请输入用户名和密码' });
     }
     const user = db.findUserByUsername(String(username).trim());
-    if (!user) return res.status(401).json({ ok: false, error: '用户名或密码错误' });
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ ok: false, error: '用户名或密码错误' });
+    // 关键：用户不存在时也对假哈希跑一次 bcrypt（永远 false），拉平响应时间，
+    // 防止攻击者通过"响应快慢"枚举有效用户名（错误信息虽统一，但时间差会泄露存在性）
+    const ok = user
+      ? await bcrypt.compare(password, user.passwordHash)
+      : await bcrypt.compare(password, DUMMY_HASH);
+    if (!user || !ok) return res.status(401).json({ ok: false, error: '用户名或密码错误' });
     const safeUser = { id: user.id, username: user.username, createdAt: user.createdAt };
     const token = signToken(safeUser);
     // 登录也确保有默认分类（兼容老用户）
@@ -146,10 +235,15 @@ app.get('/api/health', (req, res) => res.json({ ok: true, msg: '🐰 图库服�
 app.get('/api/images', requireAuth, (req, res) => {
   try {
     const list = db.getImages({ category: req.query.category, userId: req.user.id });
+    // 本地存储的 url 现场签名（COS 公网 URL 不签）；缩略图也签（私有图库缩略图同样是隐私）
+    list.forEach(img => {
+      img.url = signUrlIfNeeded(img.url);
+      if (img.thumbnailUrl) img.thumbnailUrl = signUrlIfNeeded(img.thumbnailUrl);
+    });
     res.json(list);
   } catch (err) {
     console.error('[GET /api/images]', err);
-    res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: '服务器内部错误' });
   }
 });
 
@@ -168,6 +262,14 @@ app.post('/api/upload', requireAuth, (req, res) => {
       // 校验目标分类属于当前用户（或公共默认分类）
       const userCats = db.getUserCategoryIds(req.user.id);
       const finalCategory = userCats.includes(targetCategory) ? targetCategory : userCats[0];
+      // 本地存储配额校验（OSS 弹性容量不限；UPLOAD_QUOTA_MB=0 不限）
+      if (storage.type === 'local' && UPLOAD_QUOTA_MB > 0) {
+        const batchBytes = req.files.reduce((s, f) => s + f.size, 0);
+        const usedBytes = db.getUserStorageUsed(req.user.id);
+        if (usedBytes + batchBytes > UPLOAD_QUOTA_MB * 1024 * 1024) {
+          return res.status(413).json({ ok: false, error: `存储已超额：已用 ${(usedBytes / 1048576).toFixed(1)}MB + 本次 ${(batchBytes / 1048576).toFixed(1)}MB，上限 ${UPLOAD_QUOTA_MB}MB` });
+        }
+      }
       // 多文件上传时 originalName 可能是数组（每文件一个），按索引取；
       // 缺失则回退到 latin1→utf8 解码 multer 给的原始名
       const rawNames = req.body.originalName;
@@ -213,6 +315,8 @@ app.post('/api/upload', requireAuth, (req, res) => {
         });
       }
       db.addImages(items);
+      // 上传返回的本地 url 也要签名，否则前端 <img> 加载会 401（COS 公网 URL 不签）
+      items.forEach(it => { it.url = signUrlIfNeeded(it.url); });
       res.json({ ok: true, images: items });
 
       // ===== 响应后再做事：补元数据 + 缩略图（异步 fire-and-forget）=====
@@ -351,7 +455,8 @@ app.delete('/api/categories/:id', requireAuth, (req, res) => {
 app.use((err, req, res, next) => {
   console.error('[express error]', err);
   if (res.headersSent) return;
-  res.status(500).json({ ok: false, error: err.message });
+  // 不向客户端泄露内部错误细节（err.message 可能含实现信息），细节只在服务端日志
+  res.status(500).json({ ok: false, error: '服务器内部错误' });
 });
 
 db.init();

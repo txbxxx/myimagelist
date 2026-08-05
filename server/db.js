@@ -443,7 +443,8 @@ module.exports = {
   addImages,
   deleteImage,
   updateImageName,
-  updateImageMeta
+  updateImageMeta,
+  getUserStorageUsed
 };
 
 /**
@@ -464,4 +465,10 @@ function updateImageMeta(id, userId, updates) {
   values.push(id, userId);
   const info = db.prepare(`UPDATE images SET ${sets} WHERE id = ? AND user_id = ?`).run(...values);
   return info.changes > 0;
+}
+
+// 某用户已占用的存储空间（字节）。本地存储配额校验用
+function getUserStorageUsed(userId) {
+  const row = db.prepare('SELECT COALESCE(SUM(size), 0) AS total FROM images WHERE user_id = ?').get(userId);
+  return row.total || 0;
 }
