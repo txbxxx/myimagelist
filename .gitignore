@@ -8,3 +8,12 @@ client/dist/
 .idea/
 .env
 !.env.example
+
+# 数据库（含密码 hash + 用户数据，绝不进 git；部署时 db.init() 重建）
+server/db.sqlite
+server/db.sqlite-shm
+server/db.sqlite-wal
+
+# GeoNames 源数据（可由 build-cities-data.js 重建；cities.json 才是运行时数据）
+server/data/cities15000.txt
+server/data/cities15000.zip
