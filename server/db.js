@@ -64,6 +64,11 @@ function init() {
       category_id    TEXT    NOT NULL,
       user_id        TEXT,
       uploaded_at    INTEGER NOT NULL,
+      -- EXIF（上传后异步填充，老记录为 NULL）
+      taken_at       INTEGER,                          -- 拍摄时间（EXIF DateTimeOriginal，毫秒）
+      location_city  TEXT,                             -- GPS 反查城市名，如"上海"
+      lat            REAL,
+      lng            REAL,
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -129,7 +134,11 @@ function init() {
     ['width', 'INTEGER'],
     ['height', 'INTEGER'],
     ['duration_sec', 'REAL'],
-    ['storage_type', "TEXT NOT NULL DEFAULT 'local'"]  // 老记录默认 local
+    ['storage_type', "TEXT NOT NULL DEFAULT 'local'"],  // 老记录默认 local
+    ['taken_at', 'INTEGER'],                            // EXIF 拍摄时间
+    ['location_city', 'TEXT'],                          // GPS 反查城市名
+    ['lat', 'REAL'],
+    ['lng', 'REAL']
   ];
   for (const [col, type] of alterAdds) {
     if (!imageCols.has(col)) {
@@ -282,7 +291,11 @@ function getAllImages() {
     storageType: r.storage_type || 'local',
     categoryId: r.category_id,
     userId: r.user_id,
-    uploadedAt: r.uploaded_at
+    uploadedAt: r.uploaded_at,
+    takenAt: r.taken_at || null,
+    locationCity: r.location_city || null,
+    lat: r.lat,
+    lng: r.lng
   }));
 }
 
@@ -314,7 +327,11 @@ function getImages({ category, userId }) {
     storageType: r.storage_type || 'local',  // 老记录没这列时回退 local
     categoryId: r.category_id,
     userId: r.user_id,
-    uploadedAt: r.uploaded_at
+    uploadedAt: r.uploaded_at,
+    takenAt: r.taken_at || null,
+    locationCity: r.location_city || null,
+    lat: r.lat,
+    lng: r.lng
   }));
 }
 
@@ -338,7 +355,11 @@ function getImagesMissingThumb() {
     storageType: r.storage_type || 'local',
     categoryId: r.category_id,
     userId: r.user_id,
-    uploadedAt: r.uploaded_at
+    uploadedAt: r.uploaded_at,
+    takenAt: r.taken_at || null,
+    locationCity: r.location_city || null,
+    lat: r.lat,
+    lng: r.lng
   }));
 }
 
@@ -394,7 +415,11 @@ function deleteImage(id, userId) {
     durationSec: img.duration_sec,
     storageType: img.storage_type || 'local',
     categoryId: img.category_id,
-    uploadedAt: img.uploaded_at
+    uploadedAt: img.uploaded_at,
+    takenAt: img.taken_at || null,
+    locationCity: img.location_city || null,
+    lat: img.lat,
+    lng: img.lng
   };
 }
 
@@ -419,7 +444,11 @@ function updateImageName(id, newName, userId) {
     durationSec: img.duration_sec,
     storageType: img.storage_type || 'local',
     categoryId: img.category_id,
-    uploadedAt: img.uploaded_at
+    uploadedAt: img.uploaded_at,
+    takenAt: img.taken_at || null,
+    locationCity: img.location_city || null,
+    lat: img.lat,
+    lng: img.lng
   };
 }
 
@@ -444,7 +473,8 @@ module.exports = {
   deleteImage,
   updateImageName,
   updateImageMeta,
-  getUserStorageUsed
+  getUserStorageUsed,
+  updateImageExif
 };
 
 /**
@@ -471,4 +501,18 @@ function updateImageMeta(id, userId, updates) {
 function getUserStorageUsed(userId) {
   const row = db.prepare('SELECT COALESCE(SUM(size), 0) AS total FROM images WHERE user_id = ?').get(userId);
   return row.total || 0;
+}
+
+// 上传后异步更新 EXIF 字段（拍摄时间 + 城市 + 经纬度）
+function updateImageExif(id, userId, { takenAt, locationCity, lat, lng }) {
+  const info = db.prepare(
+    'UPDATE images SET taken_at = ?, location_city = ?, lat = ?, lng = ? WHERE id = ? AND user_id = ?'
+  ).run(
+    takenAt || null,
+    locationCity || null,
+    (lat != null && !Number.isNaN(lat)) ? lat : null,
+    (lng != null && !Number.isNaN(lng)) ? lng : null,
+    id, userId
+  );
+  return info.changes > 0;
 }

@@ -20,6 +20,9 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
+      exifreader:
+        specifier: ^4.42.0
+        version: 4.42.0
       express:
         specifier: ^4.19.2
         version: 4.22.2(supports-color@5.5.0)
@@ -38,6 +41,10 @@ importers:
         version: 3.1.14
 
 packages:
+
+  '@xmldom/xmldom@0.9.10':
+    resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
+    engines: {node: '>=14.6'}
 
   accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
@@ -247,6 +254,10 @@ packages:
   etag@1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+
+  exifreader@4.42.0:
+    resolution: {integrity: sha512-dvjmG8KvSoMvFCG7XaH+kRgBXUTZxWibdm6ThyjcZbA18pAALPRaLcletWg8wAeYo1E1j46q5cuTsLQJipOqsA==}
+    hasBin: true
 
   express@4.22.2:
     resolution: {integrity: sha512-IuL+Elrou2ZvCFHs18/CIzy2Nzvo25nZ1/D2eIZlz7c+QUayAcYoiM2BthCjs+EBHVpjYjcuLDAiCWgeIX3X1Q==}
@@ -687,6 +698,9 @@ packages:
 
 snapshots:
 
+  '@xmldom/xmldom@0.9.10':
+    optional: true
+
   accepts@1.3.8:
     dependencies:
       mime-types: 2.1.35
@@ -904,6 +918,10 @@ snapshots:
   escape-html@1.0.3: {}
 
   etag@1.8.1: {}
+
+  exifreader@4.42.0:
+    optionalDependencies:
+      '@xmldom/xmldom': 0.9.10
 
   express@4.22.2(supports-color@5.5.0):
     dependencies:

@@ -37,6 +37,8 @@ const db = require('./db');
 const { createStorage, backendOf } = require('./storage');
 const { probeMedia } = require('./thumbnail');
 const { ensureThumbnail } = require('./thumbnail-job');
+const { parseExif } = require('./exif');
+const { reverseGeocode } = require('./reverse-geocode');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -345,6 +347,21 @@ app.post('/api/upload', requireAuth, (req, res) => {
                 if (meta.duration) metaUpdates.durationSec = meta.duration;
                 if (Object.keys(metaUpdates).length > 0) {
                   db.updateImageMeta(item.id, item.userId, metaUpdates);
+                }
+              }
+              // EXIF：仅图片抽拍摄时间 + GPS（视频一般无 EXIF GPS）；GPS 反查城市名
+              if (item.type === 'image') {
+                const exif = parseExif(await fs.promises.readFile(localPath));
+                if (exif) {
+                  let city = null;
+                  if (exif.lat !== null && exif.lng !== null) {
+                    const geo = reverseGeocode(exif.lat, exif.lng);
+                    if (geo) city = geo.city;
+                  }
+                  db.updateImageExif(item.id, item.userId, {
+                    takenAt: exif.takenAt, locationCity: city, lat: exif.lat, lng: exif.lng
+                  });
+                  console.log(`[exif] ${item.filename} ${city ? '📍' + city + ' ' : ''}${exif.takenAt ? '🕒' + new Date(exif.takenAt).toISOString().slice(0,10) : ''}`);
                 }
               }
             }
